@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html {
+    @apply bg-obsidian text-ivory antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans font-light;
+  }
+  ::selection {
+    @apply bg-rosegold/40 text-ivory;
+  }
+  :focus-visible {
+    @apply outline outline-1 outline-offset-4 outline-champagne;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-eyebrow uppercase text-champagne/80 font-normal;
+  }
+  /* Gold foil type: a slow sheen drifts across the letters */
+  .text-gold {
+    @apply bg-gold-sheen bg-clip-text text-transparent;
+    background-size: 220% 100%;
+    animation: gold-drift 9s ease-in-out infinite alternate;
+  }
+  /* Primary buttons in polished gold leaf; the highlight slides across on hover */
+  .gold-foil {
+    @apply bg-gold-foil text-obsidian shadow-gold;
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    transition: background-position 0.9s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s, opacity 0.3s;
+  }
+  .gold-foil:hover:not(:disabled) {
+    background-position: 100% 50%;
+    box-shadow: 0 0 0 1px rgba(246, 231, 190, 0.4) inset, 0 14px 50px -10px rgba(221, 187, 120, 0.7);
+  }
+  /* Hairline rule in gold that fades out at both ends */
+  .gold-rule {
+    @apply h-px w-full bg-gold-line;
+  }
+  .glass {
+    @apply bg-obsidian/55 backdrop-blur-xl border-b border-champagne/[0.18];
+  }
+  /* Fine film grain for a cinematic, tactile finish */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Age gate: hidden before first paint for visitors who already confirmed (see AgeGate boot script) */
+html[data-age-ok="1"] #age-gate {
+  display: none;
+}
+html:not([data-age-ok="1"]) body {
+  overflow: hidden;
+}
+@keyframes gold-drift {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes age-gate-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.age-gate-in {
+  animation: age-gate-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ------------------------------------------------------------------------------------------
+   Selection controls: checkboxes, radios, switches and dropdowns share one luxury language.
+   Structure: <label class="ef-choice"><input class="ef-input"> <span class="ef-mark"> <span class="ef-label">
+   - Hover (anywhere on the label): gold border, soft gold halo, a gentle lift in scale.
+   - Checked: polished gold leaf fill.
+   - Keyboard focus: a crisp gold outline ring, shown alongside hover, never replaced by it.
+   ------------------------------------------------------------------------------------------ */
+@layer components {
+  .ef-choice {
+    @apply relative flex cursor-pointer items-center gap-3;
+  }
+  .ef-choice:has(.ef-input:disabled) {
+    @apply cursor-not-allowed opacity-50;
+  }
+  /* Native input stays in the page for screen readers, forms and keyboard, but is visually hidden */
+  .ef-input {
+    @apply sr-only;
+  }
+  .ef-mark {
+    @apply relative grid h-[18px] w-[18px] shrink-0 place-items-center border border-ivory/30 bg-obsidian/40;
+    transition:
+      border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.45s;
+  }
+  .ef-mark--round {
+    @apply rounded-full;
+  }
+  /* Inner indicator: a square for checkboxes, a jewel-like dot for radios */
+  .ef-mark::after {
+    content: "";
+    @apply h-1.5 w-1.5 bg-obsidian opacity-0;
+    transform: scale(0.4);
+    transition: opacity 0.3s, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ef-mark--round::after {
+    @apply h-2 w-2 rounded-full;
+  }
+  .ef-label {
+    @apply text-ivory/75 transition-colors duration-300;
+  }
+
+  /* Hover */
+  .ef-choice:hover .ef-input:not(:disabled) ~ .ef-mark {
+    @apply border-champagne;
+    box-shadow: 0 0 0 4px rgba(221, 187, 120, 0.1), 0 0 18px -2px rgba(221, 187, 120, 0.45);
+    transform: scale(1.08);
+  }
+  .ef-choice:hover .ef-input:not(:disabled) ~ .ef-label,
+  .ef-choice:hover .ef-input:not(:disabled) ~ * .ef-label {
+    @apply text-ivory;
+  }
+
+  /* Checked */
+  .ef-input:checked ~ .ef-mark {
+    @apply border-champagne-light bg-gold-foil;
+    background-size: 200% 100%;
+  }
+  .ef-input:checked ~ .ef-mark::after {
+    @apply opacity-100;
+    transform: scale(1);
+  }
+  .ef-input:checked ~ .ef-label {
+    @apply text-ivory;
+  }
+
+  /* Keyboard focus: always visible, layered with the hover halo */
+  .ef-input:focus-visible ~ .ef-mark,
+  .ef-input:focus-visible ~ .ef-switch {
+    outline: 1px solid #ddbb78;
+    outline-offset: 3px;
+  }
+
+  /* Switch (on/off preferences) */
+  .ef-switch {
+    @apply relative mt-0.5 h-5 w-9 shrink-0 rounded-full border border-ivory/25;
+    transition: border-color 0.45s, box-shadow 0.45s, background-color 0.45s;
+  }
+  .ef-switch::after {
+    content: "";
+    @apply absolute left-0.5 top-0.5 h-3.5 w-3.5 rounded-full bg-ivory/50;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.45s, box-shadow 0.45s;
+  }
+  .ef-choice:hover .ef-input:not(:disabled) ~ .ef-switch {
+    @apply border-champagne;
+    box-shadow: 0 0 0 4px rgba(221, 187, 120, 0.08), 0 0 18px -4px rgba(221, 187, 120, 0.45);
+  }
+  .ef-choice:hover .ef-input:not(:disabled) ~ .ef-switch::after {
+    box-shadow: 0 0 10px rgba(246, 231, 190, 0.6);
+  }
+  .ef-input:checked ~ .ef-switch {
+    @apply border-champagne bg-champagne/20;
+  }
+  .ef-input:checked ~ .ef-switch::after {
+    @apply bg-gold-foil;
+    background-size: 200% 100%;
+    transform: translateX(16px);
+  }
+
+  /* Dropdowns and text fields: the same gold response on hover */
+  .ef-select,
+  .ef-field {
+    transition: border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ef-select:hover:not(:disabled),
+  .ef-field:hover:not(:disabled) {
+    @apply border-champagne/70;
+    box-shadow: 0 10px 18px -16px rgba(221, 187, 120, 0.9);
+  }
+  .ef-select:focus-visible,
+  .ef-field:focus-visible {
+    @apply border-champagne;
+    box-shadow: 0 10px 18px -14px rgba(221, 187, 120, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-choice:hover .ef-input:not(:disabled) ~ .ef-mark {
+    transform: none;
+  }
+}

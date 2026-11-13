@@ -1,0 +1,359 @@
+import type { Audience, Feature, Product } from "./types";
+
+type Base = Omit<Product, "audience" | "features">;
+
+const img = (handle: string, title: string) => [
+  { src: `/media/products/${handle}-1.jpg`, alt: title },
+  { src: `/media/products/${handle}-2.jpg`, alt: `${title}, alternate view` },
+];
+
+const usd = (amount: number) => ({ amount, currencyCode: "USD" as const });
+
+/** Eden Flame's own pieces. */
+const own: Base[] = [
+  {
+    id: "p1", handle: "aurelia", title: "Aurelia", subtitle: "Sculpted personal massager",
+    description: "A softly curved form that rests naturally in the hand, with eight whisper-quiet intensities and a satin-touch finish.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(189),
+    images: img("aurelia", "Aurelia"), badge: "Bestseller", featured: 10, createdAt: "2026-09-02",
+  },
+  {
+    id: "p2", handle: "lumen", title: "Lumen", subtitle: "Gold-finished wand",
+    description: "Our signature piece. A slender wand finished in 24k gold over surgical steel, weighted for a reassuring, jewellery-like feel.",
+    category: "sculptural-essentials", materials: ["24k gold plating"], price: usd(420),
+    images: img("lumen", "Lumen"), badge: "Limited", featured: 9, createdAt: "2026-10-18",
+  },
+  {
+    id: "p3", handle: "solenne", title: "Solenne", subtitle: "Hand-blown glass sculpture",
+    description: "Hand-blown borosilicate glass, smooth as water and beautiful enough to leave on display. Can be warmed or cooled.",
+    category: "sculptural-essentials", materials: ["Borosilicate glass"], price: usd(145),
+    images: img("solenne", "Solenne"), featured: 7, createdAt: "2026-07-11",
+  },
+  {
+    id: "p4", handle: "vesper", title: "Vesper", subtitle: "Palm-sized massager",
+    description: "Pebble-shaped and pocketable, with a travel lock and a magnetic charger that tucks away in its silk pouch.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(159),
+    images: img("vesper", "Vesper"), badge: "New", featured: 8, createdAt: "2026-11-01",
+  },
+  {
+    id: "p5", handle: "orbis", title: "Orbis Duo", subtitle: "Shared massager for two",
+    description: "Designed to be enjoyed together, with app-free remote control and a flexible, body-hugging silhouette.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(229),
+    images: img("orbis", "Orbis Duo"), featured: 6, createdAt: "2026-06-20",
+  },
+  {
+    id: "p6", handle: "halo", title: "Halo", subtitle: "Gold-plated ring",
+    description: "A minimal ring in 24k gold plate over hypoallergenic steel. Polished by hand and presented in a velvet case.",
+    category: "sculptural-essentials", materials: ["24k gold plating"], price: usd(95),
+    images: img("halo", "Halo"), featured: 4, createdAt: "2026-05-14",
+  },
+  {
+    id: "p7", handle: "nocturne", title: "Nocturne", subtitle: "Silk blindfold",
+    description: "Cut from 22-momme mulberry silk with a padded interior that blocks every glimmer of light.",
+    category: "silk-and-senses", materials: ["Mulberry silk"], price: usd(85),
+    images: img("nocturne", "Nocturne"), badge: "Bestseller", featured: 8, createdAt: "2026-08-08",
+  },
+  {
+    id: "p8", handle: "velours", title: "Velours", subtitle: "Silk wrist ties",
+    description: "Long ribbons of mulberry silk that tie softly and release in a single pull. Gentle, elegant and adjustable.",
+    category: "silk-and-senses", materials: ["Mulberry silk"], price: usd(120),
+    images: img("velours", "Velours"), featured: 5, createdAt: "2026-04-03",
+  },
+  {
+    id: "p9", handle: "plume", title: "Plume", subtitle: "Feather tickler",
+    description: "Ethically sourced feathers set in a gold-plated handle, for the lightest, most teasing touch.",
+    category: "silk-and-senses", materials: ["24k gold plating"], price: usd(68),
+    images: img("plume", "Plume"), badge: "New", featured: 5, createdAt: "2026-10-29",
+  },
+  {
+    id: "p10", handle: "ember", title: "Ember", subtitle: "Massage candle",
+    description: "Soy and coconut wax that melts into a warm massage oil. Notes of amber, smoked vanilla and fig leaf.",
+    category: "aromatics", materials: ["Plant-based botanicals"], price: usd(58),
+    images: img("ember", "Ember"), badge: "Bestseller", featured: 9, createdAt: "2026-03-12",
+  },
+  {
+    id: "p11", handle: "elixir", title: "Elixir", subtitle: "Botanical massage oil",
+    description: "A silky, fast-absorbing blend of jojoba, rosehip and sweet almond, scented with neroli and sandalwood.",
+    category: "aromatics", materials: ["Plant-based botanicals"], price: usd(46),
+    images: img("elixir", "Elixir"), featured: 6, createdAt: "2026-02-22",
+  },
+  {
+    id: "p12", handle: "reverie", title: "Reverie", subtitle: "Pillow and body mist",
+    description: "A soft veil of rose absolute, oud and white musk for linen, skin and the moments in between.",
+    category: "aromatics", materials: ["Plant-based botanicals"], price: usd(52),
+    images: img("reverie", "Reverie"), featured: 3, createdAt: "2026-10-05",
+  },
+];
+
+/**
+ * Curated pieces from other makers. Prices are the makers' US list prices where we could verify
+ * them (see the README); confirm every price and spec against the supplier's price list before launch.
+ */
+const curated: Base[] = [
+  {
+    id: "b1", handle: "lelo-dot", brand: "LELO", title: "DOT", subtitle: "Pinpoint external massager",
+    description: "LELO's Infinite Loop technology traces a slow elliptical path rather than a simple buzz, so sensation stays precise and never numbing. Sculpted in body-safe silicone, fully waterproof and finished with the craftsmanship LELO is known for.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(179),
+    images: img("lelo-dot", "LELO DOT"), badge: "Bestseller", featured: 10, createdAt: "2026-11-03",
+    specs: [{ label: "Movement", value: "Infinite Loop elliptical tip" }, { label: "Modes", value: "8" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Battery", value: "Up to 2 hours use, 2-hour charge" }, { label: "Weight", value: "98 g" }, { label: "Care", value: "Pair with a water-based lubricant" }, { label: "Presentation", value: "Satin storage pouch" }],
+  },
+  {
+    id: "b2", handle: "le-wand-rechargeable", brand: "Le Wand", title: "Rechargeable Massager", subtitle: "High-power body wand",
+    description: "The modern successor to the classic corded wand: deep, resonant power from a heavy-duty motor, a seamless silicone head and twenty modes, all without a cable. A refined choice for full-body massage and intense, rumbling sensation.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(180),
+    images: img("le-wand-rechargeable", "Le Wand Rechargeable Massager"), badge: "Bestseller", featured: 9, createdAt: "2026-10-22",
+    specs: [{ label: "Modes", value: "20 vibration patterns, 10 intensities" }, { label: "Head", value: "Seamless silicone" }, { label: "Length", value: "34 cm" }, { label: "Power", value: "USB rechargeable, cordless" }, { label: "Travel", value: "Travel lock" }, { label: "Warranty", value: "2 years" }],
+  },
+  {
+    id: "b3", handle: "we-vibe-chorus", brand: "We-Vibe", title: "Chorus", subtitle: "Wearable couples' massager",
+    description: "A softly flexible U-shape that adjusts to fit and stays in place during intimacy, with dual motors for internal and external sensation. Squeeze the pebble remote and intensity follows your grip, or share control through the We-Vibe app.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(219),
+    images: img("we-vibe-chorus", "We-Vibe Chorus"), featured: 9, createdAt: "2026-09-30",
+    specs: [{ label: "Control", value: "Squeeze remote and We-Vibe app" }, { label: "Modes", value: "10, plus bonus modes in the app" }, { label: "Fit", value: "Adjustable, flexible arms" }, { label: "Water resistance", value: "IPX7 (remote splashproof)" }, { label: "Battery", value: "Up to 90 minutes, 2-hour charge" }, { label: "Care", value: "Pair with a water-based lubricant" }, { label: "Warranty", value: "2 years" }],
+  },
+  {
+    id: "b4", handle: "arcwave-ion-2", brand: "Arcwave", title: "Ion 2", subtitle: "Air-pulse stroker",
+    description: "Arcwave brings Pleasure Air, contact-free airwave stimulation, to male-focused design. A CleanTech silicone sleeve, Smart Silence skin sensing that starts and stops on its own, and a twist-to-open body that makes cleaning effortless.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(169),
+    images: img("arcwave-ion-2", "Arcwave Ion 2"), badge: "New", featured: 8, createdAt: "2026-11-08",
+    specs: [{ label: "Technology", value: "Pleasure Air" }, { label: "Programs", value: "3 Autopilot presets" }, { label: "Sensing", value: "Smart Silence auto on and off" }, { label: "Water resistance", value: "IPX7" }, { label: "Battery", value: "Up to 90 minutes, 2-hour charge" }, { label: "Cleaning", value: "Twist-to-open design" }, { label: "Warranty", value: "2 years" }],
+  },
+  {
+    id: "b5", handle: "lovense-osci-3", brand: "Lovense", title: "Osci 3", subtitle: "Warming oscillating rabbit",
+    description: "Rather than a simple vibration, an oscillating G-spot head moves with a deep, rhythmic motion, paired with an external motor and a gentle warming mode that reaches body temperature in a minute. Endless patterns through the Lovense app.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(139),
+    images: img("lovense-osci-3", "Lovense Osci 3"), badge: "New", featured: 8, createdAt: "2026-11-05",
+    specs: [{ label: "Movement", value: "Internal oscillation, external vibration" }, { label: "Warming", value: "Body temperature in about 60 seconds" }, { label: "Control", value: "Lovense Remote app: touch, sound or motion" }, { label: "Water resistance", value: "IPX7" }, { label: "Battery", value: "Up to 170 minutes, 75-minute charge" }, { label: "Weight", value: "185 g" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "b6", handle: "lovense-solace-pro", brand: "Lovense", title: "Solace Pro", subtitle: "Hands-free automatic stroker",
+    description: "Lovense's most advanced piece for him. Precision thrusting up to 300 strokes a minute, customisable AI patterns, and two-way remote control for solo evenings or partners miles apart. An optional desk mount makes it truly hands-free.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(299),
+    images: img("lovense-solace-pro", "Lovense Solace Pro"), badge: "New", featured: 7, createdAt: "2026-11-10",
+    specs: [{ label: "Movement", value: "Thrusting, up to 300 strokes per minute" }, { label: "Control", value: "Lovense Remote app, two-way long distance" }, { label: "Patterns", value: "Customisable AI patterns" }, { label: "Mounting", value: "Optional hands-free desk mount" }, { label: "Sync", value: "Real-time sync with interactive media" }],
+  },
+  {
+    id: "b7", handle: "the-handy", brand: "The Handy", title: "The Handy", subtitle: "App-connected stroker",
+    description: "Compact, quick and quietly powerful, with a brushless motor, adjustable stroke length and an open API. Its community has created thousands of scripts that sync to video and VR, which makes it one of the most versatile pieces of its kind.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(249),
+    images: img("the-handy", "The Handy"), featured: 6, createdAt: "2026-08-18",
+    specs: [{ label: "Speed", value: "Up to 10 strokes per second" }, { label: "Stroke length", value: "Adjustable, up to 11 cm" }, { label: "Sleeve fit", value: "1 to 7 cm" }, { label: "Control", value: "Wi-Fi app, open API" }, { label: "Sync", value: "Interactive video and VR scripts" }],
+  },
+  {
+    id: "b8", handle: "bellesa-airvibe", brand: "Bellesa", title: "AirVibe", subtitle: "Air-suction and internal massager",
+    description: "Bellesa's celebrated dual piece pairs gentle air suction for external sensation with a curved internal arm for G-spot vibration, built on the brand's Diskreet Series technology. Soft, rounded and quietly confident.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(89),
+    images: img("bellesa-airvibe", "Bellesa AirVibe"), featured: 7, createdAt: "2026-07-14",
+    specs: [{ label: "Sensation", value: "Air suction and G-spot vibration" }, { label: "Technology", value: "Diskreet Series" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "b9", handle: "b-vibe-rimming-plug-2", brand: "b-Vibe", title: "Rimming Plug 2", subtitle: "Rotating plug with remote",
+    description: "A ring of rotating beads turns gently beneath the surface while a separate motor adds vibration, each with its own settings. Body-safe silicone, a tapered shape designed for comfort, and a wireless remote. Always use with a generous water-based lubricant.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(129),
+    images: img("b-vibe-rimming-plug-2", "b-Vibe Rimming Plug 2"), featured: 5, createdAt: "2026-06-02",
+    specs: [{ label: "Movement", value: "7 rotation modes, 6 vibration modes" }, { label: "Control", value: "Wireless remote, up to 9 m" }, { label: "Size", value: "12.5 cm insertable, 4 cm at widest" }, { label: "Battery", value: "About 1.5 hours use, 2-hour charge" }, { label: "Care", value: "Water-based lubricant only" }, { label: "Warranty", value: "2 years" }],
+  },
+  {
+    id: "b10", handle: "tenga-vacuum-gyro-roller", brand: "TENGA", title: "Vacuum Gyro Roller", subtitle: "Rotating vacuum stroker",
+    description: "A gyro sensor guides smooth 360-degree rotation while adjustable vacuum pressure holds the textured sleeve close. Choose automatic rolling or guide it by hand, and change sleeves to suit the mood.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(149),
+    images: img("tenga-vacuum-gyro-roller", "TENGA Vacuum Gyro Roller"), featured: 4, createdAt: "2026-05-20",
+    specs: [{ label: "Movement", value: "Gyro-guided 360-degree rotation" }, { label: "Suction", value: "2 vacuum strengths, 4 rhythms" }, { label: "Modes", value: "Automatic or manual rolling" }, { label: "Sleeves", value: "Replaceable TENGA Rolling Cups" }, { label: "Power", value: "Rechargeable" }],
+  },
+  // Bestsellers for her and for him, added 2026-11-13 (prices are US list prices; confirm with suppliers)
+  {
+    id: "c1", handle: "magic-wand-rechargeable", brand: "Magic Wand", title: "Rechargeable", subtitle: "The iconic body wand, cordless",
+    description: "The original, reimagined without the cord. A smooth silicone head on a flexible neck delivers the deep, famously powerful sensation that made it a classic, with eight vibration styles and hours of play from a single charge.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(150),
+    images: img("magic-wand-rechargeable", "Magic Wand Rechargeable"), badge: "Bestseller", featured: 10, createdAt: "2026-10-30",
+    specs: [{ label: "Modes", value: "4 speeds, 4 patterns" }, { label: "Battery", value: "Up to 3 hours use" }, { label: "Neck", value: "Flexible, with a smooth head" }, { label: "Power", value: "Cordless, or plugged in as it charges" }, { label: "Water resistance", value: "Not waterproof, for external use" }],
+  },
+  {
+    id: "c2", handle: "womanizer-premium-2", brand: "Womanizer", title: "Premium 2", subtitle: "Pleasure Air clitoral stimulator",
+    description: "Womanizer's touch-free Pleasure Air technology, refined. Fourteen intensities, an Autopilot that varies the rhythm for you, and Smart Silence, which only switches on at the skin. Soft silicone and fully waterproof.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(189),
+    images: img("womanizer-premium-2", "Womanizer Premium 2"), badge: "Bestseller", featured: 10, createdAt: "2026-10-12",
+    specs: [{ label: "Technology", value: "Pleasure Air, touch-free" }, { label: "Intensities", value: "14, plus Autopilot" }, { label: "Sensing", value: "Smart Silence" }, { label: "Water resistance", value: "Fully submersible" }, { label: "Battery", value: "Up to 4 hours use" }],
+  },
+  {
+    id: "c3", handle: "womanizer-next", brand: "Womanizer", title: "Next", subtitle: "Pleasure Air with Climax Control",
+    description: "The newest Womanizer pairs the brand's Pleasure Air with Climax Control, so you can hold the moment as long as you like before letting go. Silicone, submersible, and quietly beautiful on the nightstand.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(229),
+    images: img("womanizer-next", "Womanizer Next"), badge: "New", featured: 9, createdAt: "2026-11-09",
+    specs: [{ label: "Technology", value: "Pleasure Air with Climax Control" }, { label: "Water resistance", value: "Fully submersible" }, { label: "Power", value: "Rechargeable" }],
+  },
+  {
+    id: "c4", handle: "lelo-gigi-3", brand: "LELO", title: "GIGI 3", subtitle: "App-connected internal massager",
+    description: "A gently flattened tip, curved to find its place, in LELO's extra-soft silicone. Eight vibration patterns on the body and two more in the LELO app, which lets you shape sensation in real time. Fully waterproof.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(149),
+    images: img("lelo-gigi-3", "LELO GIGI 3"), featured: 8, createdAt: "2026-09-18",
+    specs: [{ label: "Patterns", value: "8, plus 2 in the app" }, { label: "Control", value: "Buttons or LELO app" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "c5", handle: "lelo-sona-3-cruise", brand: "LELO", title: "SONA 3 Cruise", subtitle: "Sonic clitoral massager",
+    description: "Sonic waves rather than suction, for a deeper, more resonant external sensation. Ten modes with sixteen micro-intensities, app-connected and fully waterproof.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(179),
+    images: img("lelo-sona-3-cruise", "LELO SONA 3 Cruise"), badge: "New", featured: 8, createdAt: "2026-11-02",
+    specs: [{ label: "Technology", value: "Sonic waves" }, { label: "Modes", value: "10, with 16 micro-intensities" }, { label: "Control", value: "Buttons or LELO app" }, { label: "Water resistance", value: "Fully waterproof" }],
+  },
+  {
+    id: "c6", handle: "lelo-enigma-double-sonic", brand: "LELO", title: "ENIGMA Double Sonic", subtitle: "Dual sonic massager",
+    description: "Sonic waves inside and out, from one sculpted form. LELO's dual-stimulation icon in extra-soft silicone, with eight settings and app control for when you'd like to explore further.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(249),
+    images: img("lelo-enigma-double-sonic", "LELO ENIGMA Double Sonic"), featured: 7, createdAt: "2026-08-26",
+    specs: [{ label: "Technology", value: "Dual sonic, internal and external" }, { label: "Settings", value: "8" }, { label: "Control", value: "Buttons or LELO app" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "c7", handle: "lelo-smart-wand-2", brand: "LELO", title: "SMART WAND 2", subtitle: "Body massager, medium",
+    description: "A full-body massager with a deep, rumbling motor and ten patterns, made for long, unhurried sessions. Fully waterproof, with LELO's extra-long-lasting charge.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(219),
+    images: img("lelo-smart-wand-2", "LELO SMART WAND 2"), featured: 6, createdAt: "2026-07-22",
+    specs: [{ label: "Patterns", value: "10" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Battery", value: "Extra-long-lasting charge" }, { label: "Size", value: "Medium" }],
+  },
+  {
+    id: "c8", handle: "lovense-lush-4", brand: "Lovense", title: "Lush 4", subtitle: "Wearable app-connected massager",
+    description: "Lovense's best-loved wearable, now in its fourth generation. A soft silicone curve that stays discreetly in place, close or long-distance app control, and up to five hours of play. Fully submersible.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(149),
+    images: img("lovense-lush-4", "Lovense Lush 4"), badge: "Bestseller", featured: 9, createdAt: "2026-10-04",
+    specs: [{ label: "Control", value: "Lovense Remote app, close or long distance" }, { label: "Modes", value: "3 speeds, 4 patterns, unlimited in the app" }, { label: "Battery", value: "Up to 297 minutes" }, { label: "Water resistance", value: "Fully submersible" }, { label: "Fit", value: "Wearable, curved to stay in place" }],
+  },
+  {
+    id: "c9", handle: "we-vibe-sync-o", brand: "We-Vibe", title: "Sync O", subtitle: "Wearable couples' massager",
+    description: "A softly adjustable shape worn during intimacy, so both of you feel every pulse. Ten intensities, a remote or the We-Vibe app, and long play time for evenings that don't hurry.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(179),
+    images: img("we-vibe-sync-o", "We-Vibe Sync O"), badge: "New", featured: 7, createdAt: "2026-11-06",
+    specs: [{ label: "Control", value: "Remote and We-Vibe app" }, { label: "Intensities", value: "10" }, { label: "Battery", value: "Up to 150 minutes" }, { label: "Water resistance", value: "Fully submersible" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "c10", handle: "we-vibe-touch-x", brand: "We-Vibe", title: "Touch X", subtitle: "Contoured external massager",
+    description: "A palm-sized, softly contoured external massager that nestles comfortably in the hand. One of We-Vibe's quiet bestsellers.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(109),
+    images: img("we-vibe-touch-x", "We-Vibe Touch X"), featured: 6, createdAt: "2026-06-28",
+    specs: [{ label: "Type", value: "External massager" }, { label: "Power", value: "Rechargeable" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "c11", handle: "arcwave-voy", brand: "Arcwave", title: "Voy", subtitle: "Adjustable-fit stroker",
+    description: "Arcwave's elegant manual stroker. A twist dial adjusts the fit across eight settings, and the CleanTech silicone sleeve slides out to rinse clean. No batteries, no noise, nothing to charge.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(99),
+    images: img("arcwave-voy", "Arcwave Voy"), badge: "Bestseller", featured: 9, createdAt: "2026-09-12",
+    specs: [{ label: "Fit", value: "Tightness Adjustment System, 8 settings" }, { label: "Sleeve", value: "CleanTech silicone, removable" }, { label: "Power", value: "None required" }, { label: "Warranty", value: "2 years" }],
+  },
+  {
+    id: "c12", handle: "arcwave-perk", brand: "Arcwave", title: "Perk", subtitle: "Vibrating prostate massager",
+    description: "A considered first step into prostate pleasure, from the makers of the Ion. Gently curved, quietly vibrating, and designed with Arcwave's characteristic restraint.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(130),
+    images: img("arcwave-perk", "Arcwave Perk"), badge: "New", featured: 7, createdAt: "2026-11-07",
+    specs: [{ label: "Type", value: "Vibrating prostate massager" }, { label: "Power", value: "Rechargeable" }, { label: "Care", value: "Water-based lubricant only" }],
+  },
+  {
+    id: "c13", handle: "lelo-f1s-v3-xl", brand: "LELO", title: "F1S V3 XL", subtitle: "App-connected stroker",
+    description: "LELO's sculpted stroker in its largest form. Two motors, an app with an interactive AI mode, and a fully waterproof shell that looks more like a design object than a device.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone", "Body-safe ABS"], price: usd(190),
+    images: img("lelo-f1s-v3-xl", "LELO F1S V3 XL"), badge: "New", featured: 8, createdAt: "2026-10-25",
+    specs: [{ label: "Motors", value: "2" }, { label: "Control", value: "LELO app, with interactive AI mode" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Size", value: "XL" }],
+  },
+  {
+    id: "c14", handle: "lelo-tor-3", brand: "LELO", title: "TOR 3", subtitle: "App-connected couples' ring",
+    description: "A soft, stretchable ring that adds vibration for both partners during intimacy. Eight patterns, Bluetooth app control, fully waterproof.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(170),
+    images: img("lelo-tor-3", "LELO TOR 3"), featured: 7, createdAt: "2026-08-14",
+    specs: [{ label: "Patterns", value: "8" }, { label: "Control", value: "Buttons or LELO app" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Care", value: "Pair with a water-based lubricant" }],
+  },
+  {
+    id: "c15", handle: "lelo-hugo-2", brand: "LELO", title: "HUGO 2", subtitle: "Remote-controlled prostate massager",
+    description: "A smooth silicone prostate massager with wireless remote control, so you can keep it to yourself or hand control to a partner. Fully waterproof.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(220),
+    images: img("lelo-hugo-2", "LELO HUGO 2"), featured: 7, createdAt: "2026-07-30",
+    specs: [{ label: "Control", value: "Wireless remote" }, { label: "Water resistance", value: "Fully waterproof" }, { label: "Care", value: "Water-based lubricant only" }],
+  },
+  {
+    id: "c16", handle: "lovense-edge-2", brand: "Lovense", title: "Edge 2", subtitle: "Adjustable prostate massager",
+    description: "An adjustable silicone body that bends to fit, with a curved tip. Close or long-distance app control and music sync make it as easy to share as to keep to yourself.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(140),
+    images: img("lovense-edge-2", "Lovense Edge 2"), featured: 6, createdAt: "2026-09-04",
+    specs: [{ label: "Fit", value: "Adjustable body" }, { label: "Control", value: "Lovense Remote app, close or long distance" }, { label: "Modes", value: "3 speeds, 4 patterns, plus music sync" }, { label: "Battery", value: "Up to 100 minutes" }, { label: "Water resistance", value: "Fully submersible" }],
+  },
+  {
+    id: "c17", handle: "lovense-max-2", brand: "Lovense", title: "Max 2", subtitle: "App-connected stroker",
+    description: "Lovense's app-connected stroker for him. Control it yourself, hand it to a partner through the Lovense app, or pair it with their Lovense piece from anywhere.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(140),
+    images: img("lovense-max-2", "Lovense Max 2"), featured: 6, createdAt: "2026-06-16",
+    specs: [{ label: "Control", value: "Lovense Remote app, close or long distance" }, { label: "Power", value: "Rechargeable" }],
+  },
+  {
+    id: "c18", handle: "we-vibe-vector-plus", brand: "We-Vibe", title: "Vector+", subtitle: "Adjustable prostate massager",
+    description: "Two motors in an adjustable silicone body that holds its position for a personal fit. A slim remote or the We-Vibe app give you, or a partner, complete control.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(149),
+    images: img("we-vibe-vector-plus", "We-Vibe Vector+"), featured: 6, createdAt: "2026-08-08",
+    specs: [{ label: "Control", value: "Remote and We-Vibe app" }, { label: "Modes", value: "4 intensities, 6 patterns" }, { label: "Battery", value: "Up to 2 hours use, 90-minute charge" }, { label: "Water resistance", value: "Fully submersible" }, { label: "Care", value: "Water-based lubricant only" }],
+  },
+  {
+    id: "c19", handle: "tenga-flip-zero", brand: "TENGA", title: "Flip Zero", subtitle: "Reusable luxury stroker",
+    description: "TENGA's flagship reusable design. The shell opens like a book for effortless cleaning and drying, and the intricate inner texture is engineered for a remarkable sensation. Nothing to charge.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(100),
+    images: img("tenga-flip-zero", "TENGA Flip Zero"), featured: 5, createdAt: "2026-05-26",
+    specs: [{ label: "Design", value: "Opens flat to clean and dry" }, { label: "Power", value: "None required" }, { label: "Care", value: "Use a water-based lubricant" }],
+  },
+  {
+    id: "c20", handle: "kiiroo-keon", brand: "Kiiroo", title: "Keon", subtitle: "Interactive stroker set",
+    description: "An automatic stroker that moves in time with interactive content through the Kiiroo app, supplied as a complete set.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(285),
+    images: img("kiiroo-keon", "Kiiroo Keon"), featured: 5, createdAt: "2026-07-08",
+    specs: [{ label: "Movement", value: "Automatic stroking" }, { label: "Control", value: "Kiiroo app, interactive content" }, { label: "Set", value: "Device and sleeve" }],
+  },
+];
+
+const W: Feature = "Waterproof", R: Feature = "Rechargeable", APP: Feature = "App controlled", REM: Feature = "Remote controlled", HF: Feature = "Hands-free", WARM: Feature = "Warming";
+
+/** Who each piece is for, and its features (for the "Shop for" and "Features" filters). */
+const tags: Record<string, [Audience[], Feature[]]> = {
+  aurelia: [["her"], [W, R]],
+  lumen: [["her"], [W, R]],
+  solenne: [["her", "him"], [W]],
+  vesper: [["her"], [W, R]],
+  orbis: [["two"], [REM, HF, W, R]],
+  halo: [["him", "two"], []],
+  nocturne: [["two"], []],
+  velours: [["two"], []],
+  plume: [["two"], []],
+  ember: [["two"], []],
+  elixir: [["two"], []],
+  reverie: [["two"], []],
+  "lelo-dot": [["her"], [W, R]],
+  "le-wand-rechargeable": [["her", "two"], [R]],
+  "we-vibe-chorus": [["two"], [APP, REM, HF, W, R]],
+  "arcwave-ion-2": [["him"], [HF, W, R]],
+  "lovense-osci-3": [["her"], [APP, W, R, WARM]],
+  "lovense-solace-pro": [["him"], [APP, REM, HF]],
+  "the-handy": [["him"], [APP, HF]],
+  "bellesa-airvibe": [["her"], []],
+  "b-vibe-rimming-plug-2": [["him", "two"], [REM, HF, R]],
+  "tenga-vacuum-gyro-roller": [["him"], [HF, R]],
+  "magic-wand-rechargeable": [["her", "two"], [R]],
+  "womanizer-premium-2": [["her"], [W, R]],
+  "womanizer-next": [["her"], [W, R]],
+  "lelo-gigi-3": [["her"], [APP, W, R]],
+  "lelo-sona-3-cruise": [["her"], [APP, W, R]],
+  "lelo-enigma-double-sonic": [["her"], [APP, W, R]],
+  "lelo-smart-wand-2": [["her", "two"], [W, R]],
+  "lovense-lush-4": [["her", "two"], [APP, HF, W, R]],
+  "we-vibe-sync-o": [["her", "two"], [APP, REM, HF, W, R]],
+  "we-vibe-touch-x": [["her"], [R]],
+  "arcwave-voy": [["him"], []],
+  "arcwave-perk": [["him"], [R]],
+  "lelo-f1s-v3-xl": [["him"], [APP, W, R]],
+  "lelo-tor-3": [["him", "two"], [APP, HF, W, R]],
+  "lelo-hugo-2": [["him"], [REM, HF, W, R]],
+  "lovense-edge-2": [["him", "two"], [APP, HF, W, R]],
+  "lovense-max-2": [["him"], [APP, R]],
+  "we-vibe-vector-plus": [["him"], [APP, REM, HF, W, R]],
+  "tenga-flip-zero": [["him"], []],
+  "kiiroo-keon": [["him"], [APP, HF]],
+};
+
+/** Sample catalog. Used when EDEN_API_URL is not set (design mode). */
+export const products: Product[] = [...own.map((p) => ({ ...p, brand: "Eden Flame" })), ...curated].map((p) => ({
+  ...p,
+  audience: tags[p.handle]?.[0] ?? ["two"],
+  features: tags[p.handle]?.[1] ?? [],
+}));
