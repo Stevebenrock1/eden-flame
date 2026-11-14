@@ -3,7 +3,7 @@ import { Globe2, Lock, Package } from "lucide-react";
 const items = [
   { icon: Package, title: "Plain packaging", body: "Unbranded outer box, neutral return address." },
   { icon: Lock, title: "Discreet billing", body: "Appears on statements as “EF Studio.”" },
-  { icon: Globe2, title: "Global shipping", body: "Tracked delivery to over 40 countries." },
+  { icon: Globe2, title: "Australia-wide delivery", body: "Tracked, usually 2 to 6 business days." },
 ];
 
 export function DiscretionPromise({ compact = false }: { compact?: boolean }) {

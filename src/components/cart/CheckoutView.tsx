@@ -9,6 +9,7 @@ import { DiscretionPromise } from "@/components/cart/DiscretionPromise";
 import { useBagLines } from "@/components/cart/useBagLines";
 import { ButtonLink } from "@/components/ui/Button";
 import { LoopFilm } from "@/components/ui/LoopFilm";
+import { Checkbox } from "@/components/ui/Choice";
 import { Toggle } from "@/components/ui/Toggle";
 import { siteConfig } from "@/config/site";
 import { formatPrice, type Product } from "@/lib/commerce";
@@ -19,7 +20,8 @@ import { fadeUp } from "@/lib/motion";
 
 const usd = (amount: number) => formatPrice({ amount, currencyCode: "USD" });
 
-const COUNTRIES = ["United States", "United Kingdom", "Australia", "Canada", "Germany", "France", "Singapore", "Vietnam", "Other"];
+/** We currently deliver within Australia only (see /shipping). */
+const COUNTRIES = ["Australia"];
 
 const field =
   "ef-field w-full border-b border-ivory/20 bg-transparent py-3 text-sm text-ivory placeholder:text-ivory/35 focus:border-champagne focus:outline-none";
@@ -140,7 +142,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
               <input aria-label="Address" required autoComplete="street-address" placeholder="Address" className={`${field} sm:col-span-2`} />
               <input aria-label="City" required autoComplete="address-level2" placeholder="City" className={field} />
               <input aria-label="Postal code" required autoComplete="postal-code" placeholder="Postal code" className={field} />
-              <select aria-label="Country" required defaultValue="" autoComplete="country-name" className={`${field} sm:col-span-2`}>
+              <select aria-label="Country" required defaultValue="Australia" autoComplete="country-name" className={`${field} sm:col-span-2`}>
                 <option value="" disabled className="bg-obsidian">Country</option>
                 {COUNTRIES.map((c) => <option key={c} className="bg-obsidian">{c}</option>)}
               </select>
@@ -165,6 +167,13 @@ export function CheckoutView({ products }: { products: Product[] }) {
               <span className="text-ivory">EF Studio</span>.
             </div>
           </fieldset>
+
+          <Checkbox
+            required
+            name="age-terms"
+            labelClassName="text-sm leading-relaxed text-ivory/70"
+            label={<>I confirm I am 18 or over and agree to the <Link href="/terms" target="_blank" className="text-champagne underline-offset-4 hover:underline">Terms of Sale</Link> and <Link href="/privacy" target="_blank" className="text-champagne underline-offset-4 hover:underline">Privacy Policy</Link>.</>}
+          />
 
           {(error ?? bagError) && <p role="alert" className="border-l border-rosegold pl-4 text-sm text-rosegold">{error ?? bagError}</p>}
           <button type="submit" disabled={submitting} className="flex h-14 w-full items-center justify-center gap-2 gold-foil text-[0.75rem] uppercase tracking-luxe text-obsidian transition-all duration-500 disabled:cursor-wait disabled:opacity-70">

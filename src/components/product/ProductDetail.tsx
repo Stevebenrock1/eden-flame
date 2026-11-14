@@ -23,7 +23,7 @@ interface Props {
 const promises = [
   { icon: Package, title: "Discreet packaging", body: "Shipped in a plain, unbranded outer box with a neutral return address. Nothing on the outside hints at what's inside." },
   { icon: ShieldCheck, title: "Private billing", body: "Your bank statement shows only “EF Studio.” We never share or sell your details." },
-  { icon: Truck, title: "Worldwide shipping", body: "Complimentary tracked shipping over $100. Most orders arrive in 2 to 5 business days." },
+  { icon: Truck, title: "Australia-wide shipping", body: "Complimentary tracked shipping over $100. Most orders arrive in 2 to 6 business days." },
   { icon: RotateCcw, title: "100-day promise", body: "If it isn't right, return it unopened within 100 days, or contact us about our hygiene-safe exchange." },
 ];
 

@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { CreditCard, Mail, Package, Plus, ShieldCheck, UserX } from "lucide-react";
+import { motion } from "framer-motion";
+import { CreditCard, Mail, Package, ShieldCheck, UserX } from "lucide-react";
+import { AccordionItem } from "@/components/ui/Accordion";
 import { ButtonLink } from "@/components/ui/Button";
 import { LoopFilm } from "@/components/ui/LoopFilm";
 import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/cn";
-import { fadeUp, luxeEase, stagger } from "@/lib/motion";
+import { fadeUp, stagger } from "@/lib/motion";
 
 const film = siteConfig.discretionFilm;
 
@@ -144,7 +143,7 @@ export function DiscretionPage() {
           </div>
           <div className="divide-y divide-ivory/[0.08] border-y border-ivory/[0.08]">
             {faqs.map((f, i) => (
-              <Faq key={f.q} q={f.q} a={f.a} defaultOpen={i === 0} />
+              <AccordionItem key={f.q} q={f.q} defaultOpen={i === 0}><p>{f.a}</p></AccordionItem>
             ))}
           </div>
         </div>
@@ -155,24 +154,5 @@ export function DiscretionPage() {
         <ButtonLink href="/shop" className="mt-10">Explore the Collection</ButtonLink>
       </section>
     </>
-  );
-}
-
-function Faq({ q, a, defaultOpen }: { q: string; a: string; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(!!defaultOpen);
-  return (
-    <div>
-      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-4 py-6 text-left font-serif text-xl text-ivory hover:text-champagne">
-        <span className="flex-1">{q}</span>
-        <Plus strokeWidth={1.25} className={cn("h-4 w-4 shrink-0 transition-transform duration-500 ease-luxe", open && "rotate-45")} />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.45, ease: luxeEase }} className="overflow-hidden">
-            <p className="max-w-xl pb-6 text-sm leading-relaxed text-ivory/60">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 }
