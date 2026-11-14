@@ -42,6 +42,7 @@ const SENSATION_OF: Record<string, Sensation[]> = {
   vesper: ["focused"],
   "arcwave-ion-2": ["focused", "connected"],
   aurelia: ["deep"],
+  seraphine: ["deep"],
   lumen: ["deep"],
   "le-wand-rechargeable": ["deep"],
   "lovense-osci-3": ["deep", "connected"],
