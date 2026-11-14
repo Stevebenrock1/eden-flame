@@ -379,7 +379,6 @@ const PHOTOS: Record<string, string> = {
   "lelo-enigma-double-sonic": "88329_a50181_purple",
   "lelo-smart-wand-2": "79907_a44323_black",
   "lovense-lush-4": "87626_a49593_pink",
-  "we-vibe-sync-o": "87707_a49654_green",
   "we-vibe-touch-x": "82225_a45648_green",
   "arcwave-voy": "85023_a47471_black",
   "arcwave-perk": "87089_a49129_black",
