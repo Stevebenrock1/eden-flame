@@ -83,6 +83,12 @@ const own: Base[] = [
     category: "aromatics", materials: ["Plant-based botanicals"], price: usd(52),
     images: img("reverie", "Reverie"), featured: 3, createdAt: "2026-10-05",
   },
+  {
+    id: "p13", handle: "seraphine", title: "Seraphine", subtitle: "Contoured G-spot massager",
+    description: "A gently curved silhouette with a spiralled, softly ribbed tip and a single-touch control. Designed to find the right angle without effort, finished in velvet-soft silicone.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(129),
+    images: img("seraphine", "Seraphine"), badge: "New", featured: 8, createdAt: "2026-11-14",
+  },
 ];
 
 /**
@@ -308,6 +314,7 @@ const W: Feature = "Waterproof", R: Feature = "Rechargeable", APP: Feature = "Ap
 /** Who each piece is for, and its features (for the "Shop for" and "Features" filters). */
 const tags: Record<string, [Audience[], Feature[]]> = {
   aurelia: [["her"], [W, R]],
+  seraphine: [["her"], []],
   lumen: [["her"], [W, R]],
   solenne: [["her", "him"], [W]],
   vesper: [["her"], [W, R]],
