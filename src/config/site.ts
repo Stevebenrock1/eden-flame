@@ -22,7 +22,7 @@ export const siteConfig = {
   },
   /**
    * Discretion film: Steve's finger-to-lips photo (supplied 2026-11-17), graded low-key and turned
-   * into a slow 16s push-in loop. Confirm the photo's licence allows commercial use before launch.
+   * into a slow 16s push-in loop. Source: Unsplash LxmFgaLXy5c by Sasun Bughdaryan (Unsplash License).
    */
   discretionFilm: {
     mp4: "/media/discretion-hush.mp4",
