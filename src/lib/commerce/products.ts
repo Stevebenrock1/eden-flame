@@ -89,6 +89,12 @@ const own: Base[] = [
     category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(129),
     images: img("seraphine", "Seraphine"), badge: "New", featured: 8, createdAt: "2026-11-14",
   },
+  {
+    id: "p14", handle: "rosalind", title: "Rosalind", subtitle: "Air-pulse rose massager",
+    description: "A sculpted rose in soft-touch silicone. At its heart, gentle waves of air pulse in rhythm, drawing sensation in without direct contact or vibration. One discreet touch control, a whisper-quiet motor and a shape that sits naturally in the palm.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(89),
+    images: img("rosalind", "Rosalind"), badge: "New", featured: 7, createdAt: "2026-11-17",
+  },
 ];
 
 /**
@@ -315,6 +321,7 @@ const W: Feature = "Waterproof", R: Feature = "Rechargeable", APP: Feature = "Ap
 const tags: Record<string, [Audience[], Feature[]]> = {
   aurelia: [["her"], [W, R]],
   seraphine: [["her"], []],
+  rosalind: [["her"], [R]],
   lumen: [["her"], [W, R]],
   solenne: [["her", "him"], [W]],
   vesper: [["her"], [W, R]],
