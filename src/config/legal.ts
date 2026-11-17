@@ -1,13 +1,13 @@
 /**
  * Business and policy details used across the legal pages.
- * PLACEHOLDERS to confirm with Steve before launch: abn, businessName, delivery times, return window.
+ * Confirmed 2026-11-17: ABN and entity (sole trader). Still placeholders: delivery times, return window.
  */
 export const legal = {
   brand: "Eden Flame",
   /** Registered business name (ABR). Leave blank to hide until confirmed. */
-  businessName: "",
+  businessName: "Steven Lloyd",
   /** Shown on the policies once supplied. */
-  abn: "",
+  abn: "93 161 763 771",
   state: "Western Australia",
   email: "hello@edenflame.com.au",
   statementName: "EF Studio",

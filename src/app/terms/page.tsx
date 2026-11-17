@@ -20,7 +20,7 @@ export default function Page() {
         {
           id: "about",
           title: "About us",
-          body: <p>This site is operated by {legal.brand}{legal.businessName ? `, a trading name of ${legal.businessName}` : ""}{legal.abn ? ` (ABN ${legal.abn})` : ""}, {legal.state}, Australia. You can reach us at <a href={`mailto:${legal.email}`} className={a}>{legal.email}</a>.</p>,
+          body: <p>This site is {legal.brand}{legal.businessName ? `, operated by ${legal.businessName}` : ""}{legal.abn ? ` (ABN ${legal.abn})` : ""}, {legal.state}, Australia. You can reach us at <a href={`mailto:${legal.email}`} className={a}>{legal.email}</a>.</p>,
         },
         {
           id: "age",

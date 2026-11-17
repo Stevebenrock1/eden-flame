@@ -20,7 +20,7 @@ export default function Page() {
           title: "Who we are",
           body: (
             <p>
-              {legal.brand}{legal.businessName ? ` is a trading name of ${legal.businessName}` : ""}{legal.abn ? ` (ABN ${legal.abn})` : ""}, an online boutique based in {legal.state}, Australia.
+              {legal.brand}{legal.businessName ? ` is operated by ${legal.businessName}` : ""}{legal.abn ? ` (ABN ${legal.abn})` : ""}. We are an online boutique based in {legal.state}, Australia.
               When this policy says &ldquo;we&rdquo; or &ldquo;us&rdquo;, it means {legal.brand}.
             </p>
           ),
