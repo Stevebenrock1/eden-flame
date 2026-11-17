@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { legal } from "@/config/legal";
 import { useState } from "react";
 import { ArrowRight, Lock } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
@@ -109,7 +110,7 @@ export function Footer() {
             <Lock strokeWidth={1.25} className="h-3.5 w-3.5" />
             Secure checkout &middot; Plain packaging &middot; Billed as &ldquo;EF Studio&rdquo;
           </p>
-          <p>For adults 18+ only.</p>
+          <p>For adults 18+ only &middot; ABN {legal.abn}</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-ivory">Privacy</Link>
             <Link href="/terms" className="hover:text-ivory">Terms</Link>
