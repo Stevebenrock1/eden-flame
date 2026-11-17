@@ -21,14 +21,15 @@ export const siteConfig = {
     mobilePoster: "/media/hero-film-mobile-poster.jpg",
   },
   /**
-   * Discretion film. PREVIEW ONLY: this is Getty Images comp 1169868177 (watermarked, 768px).
-   * Licence the clip from Getty before launch, then drop the HD file in with the same names.
+   * Discretion film. TEMPORARY: the gold satin loop we own, while the final clip is chosen.
+   * (The Getty comp 1169868177 was removed 2026-11-17: watermarked previews can't run on a live site.)
    */
   discretionFilm: {
-    mp4: "/media/discretion-film-preview.mp4",
-    webm: "/media/discretion-film-preview.webm",
-    poster: "/media/discretion-film-poster.jpg",
+    mp4: "/media/hero-silk.mp4",
+    webm: "/media/hero-silk.webm",
+    poster: "/media/hero-silk-poster.jpg",
   },
+
   categories: [
     {
       slug: "sculptural-essentials",
