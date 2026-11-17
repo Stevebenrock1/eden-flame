@@ -365,9 +365,31 @@ const tags: Record<string, [Audience[], Feature[]]> = {
   "kiiroo-keon": [["him"], [APP, HF]],
 };
 
-/** Sample catalog. Used when EDEN_API_URL is not set (design mode). */
-export const products: Product[] = [...own.map((p) => ({ ...p, brand: "Eden Flame" })), ...curated].map((p) => ({
+/**
+ * Launch range (2026-11-17): Steve asked to condense the catalogue to what a new business can stock.
+ * Picked for trend strength and an Australian wholesale route (Sugar and Sas: We-Vibe, Womanizer, Arcwave;
+ * Calvista: Lovense; Vibratex: Magic Wand; Faire: Le Wand). Everything else stays defined below but hidden;
+ * add a handle back here to bring it back.
+ */
+export const LAUNCH_RANGE = new Set([
+  // Eden Flame own label
+  "seraphine", "rosalind",
+  // For her
+  "womanizer-premium-2", "magic-wand-rechargeable", "lovense-lush-4", "we-vibe-touch-x",
+  // For him
+  "we-vibe-vector-plus", "lovense-edge-2", "lovense-max-2", "arcwave-ion-2",
+  // For two
+  "we-vibe-chorus", "we-vibe-sync-o", "le-wand-rechargeable",
+  // Silk & Senses and Aromatics (simple own-label accessories, low stock cost)
+  "nocturne", "velours", "ember", "elixir",
+]);
+
+/** Every piece we have listings for, including those not in the launch range. */
+export const allProducts: Product[] = [...own.map((p) => ({ ...p, brand: "Eden Flame" })), ...curated].map((p) => ({
   ...p,
   audience: tags[p.handle]?.[0] ?? ["two"],
   features: tags[p.handle]?.[1] ?? [],
 }));
+
+/** Sample catalog (the launch range). Used when EDEN_API_URL is not set (design mode). */
+export const products: Product[] = allProducts.filter((p) => LAUNCH_RANGE.has(p.handle));
