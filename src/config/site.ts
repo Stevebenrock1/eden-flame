@@ -21,13 +21,13 @@ export const siteConfig = {
     mobilePoster: "/media/hero-film-mobile-poster.jpg",
   },
   /**
-   * Discretion film. TEMPORARY: the gold satin loop we own, while the final clip is chosen.
-   * (The Getty comp 1169868177 was removed 2026-11-17: watermarked previews can't run on a live site.)
+   * Discretion film: Steve's finger-to-lips photo (supplied 2026-11-17), graded low-key and turned
+   * into a slow 16s push-in loop. Confirm the photo's licence allows commercial use before launch.
    */
   discretionFilm: {
-    mp4: "/media/hero-silk.mp4",
-    webm: "/media/hero-silk.webm",
-    poster: "/media/hero-silk-poster.jpg",
+    mp4: "/media/discretion-hush.mp4",
+    webm: "/media/discretion-hush.webm",
+    poster: "/media/discretion-hush-poster.jpg",
   },
 
   categories: [
