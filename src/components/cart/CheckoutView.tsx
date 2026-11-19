@@ -13,12 +13,16 @@ import { Checkbox, RadioGroup } from "@/components/ui/Choice";
 import { Toggle } from "@/components/ui/Toggle";
 import { siteConfig } from "@/config/site";
 import { formatPrice, type Product } from "@/lib/commerce";
+import { shippingFor, WELCOME_PERCENT } from "@/lib/pricing";
 import { commerceApiEnabled, useBag } from "@/lib/bag";
 import { useAuth } from "@/lib/auth";
 import { ApiError, apiFetch } from "@/lib/session";
 import { fadeUp } from "@/lib/motion";
 
-const usd = (amount: number) => formatPrice({ amount, currencyCode: "USD" });
+const usd = (amount: number) =>
+  Number.isInteger(amount)
+    ? formatPrice({ amount, currencyCode: "USD" })
+    : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(amount);
 
 /** We currently deliver within Australia only (see /shipping). */
 const COUNTRIES = ["Australia"];
@@ -28,6 +32,12 @@ interface PaymentOptions { card: boolean; applePay: boolean; googlePay: boolean;
 
 /** Design mode shows every option so the page can be reviewed; with the API, the server decides. */
 const DEMO_OPTIONS: PaymentOptions = { card: true, applePay: false, googlePay: false, paypal: true };
+
+interface AppliedCode { code: string; type: "PERCENT" | "FIXED"; value: number; minSubtotalCents: number }
+
+/** Design mode has no server, so welcome codes are recognised by their shape to preview the flow. */
+const demoCode = (code: string): AppliedCode | null =>
+  /^WELCOME-[A-Z2-9]{6}$/.test(code) ? { code, type: "PERCENT", value: WELCOME_PERCENT, minSubtotalCents: 0 } : null;
 
 const field =
   "ef-field w-full border-b border-ivory/20 bg-transparent py-3 text-sm text-ivory placeholder:text-ivory/35 focus:border-champagne focus:outline-none";
@@ -40,7 +50,37 @@ const field =
  */
 export function CheckoutView({ products }: { products: Product[] }) {
   const { clear, ready, error: bagError, refresh } = useBag();
-  const { items, subtotal, shipping, total } = useBagLines(products);
+  const { items, subtotal } = useBagLines(products);
+  const [codeInput, setCodeInput] = useState("");
+  const [applied, setApplied] = useState<AppliedCode | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
+  // Mirrors the server: percent codes round down to the cent, never more than the goods.
+  const discount = !applied
+    ? 0
+    : Math.min(subtotal, applied.type === "PERCENT" ? Math.floor(subtotal * applied.value) / 100 : applied.value / 100);
+  const shipping = shippingFor(subtotal - discount);
+  const total = subtotal - discount + shipping;
+
+  async function applyCode() {
+    const code = codeInput.trim().toUpperCase();
+    if (!code) return;
+    setCheckingCode(true);
+    setCodeError(null);
+    try {
+      const found = commerceApiEnabled
+        ? await apiFetch<AppliedCode>("/api/checkout/discount", { method: "POST", body: JSON.stringify({ code }) })
+        : demoCode(code);
+      if (!found) throw new ApiError(422, "INVALID", "This code isn't valid");
+      if (subtotal * 100 < found.minSubtotalCents) throw new ApiError(422, "MIN", "Your bag doesn't meet the minimum for this code");
+      setApplied(found);
+      setCodeInput("");
+    } catch (err) {
+      setCodeError(err instanceof ApiError ? err.message : "We couldn't check that code just now. Please try again.");
+    } finally {
+      setCheckingCode(false);
+    }
+  }
   const [placed, setPlaced] = useState<string | null>(null);
   const [noInvoice, setNoInvoice] = useState(true);
   const [plainLabel, setPlainLabel] = useState(true);
@@ -71,7 +111,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
     try {
       const { checkoutUrl } = await apiFetch<{ checkoutUrl: string }>("/api/checkout/session", {
         method: "POST",
-        body: JSON.stringify({ paymentMethod: method, plainPackaging: plainLabel, paperlessReceipt: noInvoice }),
+        body: JSON.stringify({ paymentMethod: method, discountCode: applied?.code, plainPackaging: plainLabel, paperlessReceipt: noInvoice }),
       });
       window.location.assign(checkoutUrl);
     } catch (err) {
@@ -235,8 +275,46 @@ export function CheckoutView({ products }: { products: Product[] }) {
                 </li>
               ))}
             </ul>
-            <dl className="mt-8 space-y-3 border-t border-ivory/10 pt-6 text-sm">
+            <div className="mt-8 border-t border-ivory/10 pt-6">
+              {applied ? (
+                <p className="flex items-center justify-between text-sm">
+                  <span className="text-ivory/70">Code <span className="tracking-wide text-champagne">{applied.code}</span></span>
+                  <button type="button" onClick={() => setApplied(null)} className="text-xs text-ivory/45 underline-offset-4 hover:text-champagne hover:underline">Remove</button>
+                </p>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void applyCode();
+                  }}
+                  className="flex items-center border-b border-ivory/20 focus-within:border-champagne"
+                >
+                  <label htmlFor="co-code" className="sr-only">Welcome or discount code</label>
+                  <input
+                    id="co-code"
+                    value={codeInput}
+                    onChange={(e) => setCodeInput(e.target.value)}
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    placeholder="Welcome or discount code"
+                    className="w-full bg-transparent py-3 text-sm uppercase tracking-wide text-ivory placeholder:normal-case placeholder:tracking-normal placeholder:text-ivory/35 focus:outline-none"
+                  />
+                  <button type="submit" disabled={checkingCode || !codeInput.trim()} className="shrink-0 px-1 text-[0.7rem] uppercase tracking-luxe text-champagne transition-opacity disabled:opacity-40">
+                    {checkingCode ? "Checking" : "Apply"}
+                  </button>
+                </form>
+              )}
+              {codeError && <p role="alert" className="mt-2 text-xs text-rosegold">{codeError}</p>}
+            </div>
+            <dl className="mt-6 space-y-3 text-sm">
               <div className="flex justify-between"><dt className="text-ivory/60">Subtotal</dt><dd>{usd(subtotal)}</dd></div>
+              {discount > 0 && (
+                <div className="flex justify-between text-champagne">
+                  <dt>{applied?.type === "PERCENT" ? `${applied.value}% off` : "Discount"}</dt>
+                  <dd>&minus;{usd(discount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between"><dt className="text-ivory/60">Shipping</dt><dd>{shipping === 0 ? "Complimentary" : usd(shipping)}</dd></div>
               <div className="flex justify-between border-t border-ivory/10 pt-4 text-base"><dt>Total</dt><dd>{usd(total)}</dd></div>
             </dl>

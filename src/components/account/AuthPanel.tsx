@@ -1,5 +1,6 @@
 "use client";
 
+import { WELCOME_PERCENT } from "@/lib/pricing";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock } from "lucide-react";
@@ -105,7 +106,7 @@ export function AuthPanel() {
               name="marketing"
               className="items-start text-xs"
               labelClassName="text-ivory/55 leading-relaxed"
-              label="Send me occasional private previews of new pieces. Plain subject lines, unsubscribe any time."
+              label={`Send me occasional private previews of new pieces, plus ${WELCOME_PERCENT}% off my first order. Plain subject lines, unsubscribe any time.`}
             />
           )}
 

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { legal } from "@/config/legal";
 import { useState } from "react";
 import { ArrowRight, Lock } from "lucide-react";
+import { commerceApiEnabled } from "@/lib/bag";
+import { ApiError, apiFetch } from "@/lib/session";
+import { WELCOME_PERCENT } from "@/lib/pricing";
 import { Logo } from "@/components/ui/Logo";
 import { siteConfig } from "@/config/site";
 
@@ -40,6 +43,24 @@ const columns = [
 export function Footer() {
   const [email, setEmail] = useState("");
   const [joined, setJoined] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function join() {
+    if (!email) return;
+    setBusy(true);
+    setError(null);
+    try {
+      if (commerceApiEnabled) {
+        await apiFetch("/api/newsletter/subscribe", { method: "POST", body: JSON.stringify({ email, source: "footer" }) });
+      }
+      setJoined(true);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "We couldn't sign you up just now. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <footer className="relative bg-obsidian pt-24 text-ivory">
@@ -52,17 +73,17 @@ export function Footer() {
             <p className="mt-8 max-w-sm font-serif text-2xl font-light leading-snug text-ivory/90">
               Private letters on new pieces, rituals and quiet indulgence.
             </p>
+            <p className="mt-3 text-sm text-champagne/90">Join and enjoy {WELCOME_PERCENT}% off your first order.</p>
             {joined ? (
               <p className="mt-8 text-sm text-champagne" role="status">
-                Thank you. Your first letter is on its way.
+                Welcome. Your {WELCOME_PERCENT}% code is on its way to your inbox.
               </p>
             ) : (
               <form
                 className="mt-8 flex max-w-sm items-center border-b border-ivory/25 focus-within:border-champagne"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  // Newsletter sign-up: connect to an email provider (e.g. Klaviyo) when chosen
-                  if (email) setJoined(true);
+                  void join();
                 }}
               >
                 <label htmlFor="footer-email" className="sr-only">
@@ -77,12 +98,16 @@ export function Footer() {
                   placeholder="Your email"
                   className="w-full bg-transparent py-3 text-sm text-ivory placeholder:text-ivory/40 focus:outline-none"
                 />
-                <button type="submit" aria-label="Subscribe" className="p-2 text-ivory/70 transition-colors hover:text-champagne">
+                <button type="submit" disabled={busy} aria-label="Subscribe" className="p-2 disabled:opacity-50 text-ivory/70 transition-colors hover:text-champagne">
                   <ArrowRight strokeWidth={1.25} className="h-5 w-5" />
                 </button>
               </form>
             )}
-            <p className="mt-3 text-xs text-ivory/40">Sent discreetly. Unsubscribe anytime.</p>
+            {error && <p role="alert" className="mt-3 text-xs text-rosegold">{error}</p>}
+            <p className="mt-3 max-w-sm text-xs leading-relaxed text-ivory/40">
+              Sent discreetly from &ldquo;EF Studio&rdquo;. One code per email address, for your first order. Unsubscribe anytime. See our{" "}
+              <Link href="/privacy" className="underline-offset-4 hover:text-champagne hover:underline">Privacy Policy</Link>.
+            </p>
           </div>
 
           {/* Link columns */}
