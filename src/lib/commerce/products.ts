@@ -366,8 +366,8 @@ const tags: Record<string, [Audience[], Feature[]]> = {
 };
 
 /**
- * TEMPORARY photo preview: retailer pack shots so Steve can see the look.
- * Not licensed for public use. Replace with official reseller assets before launch.
+ * Product photos: retailer pack shots (Lovehoney CDN). Steve chose on 2026-11-19 to show these on the
+ * live site before reseller approval. Swap for official brand assets as each supplier approves.
  */
 const PHOTOS: Record<string, string> = {
   "lelo-dot": "86048_a48259_purple",
