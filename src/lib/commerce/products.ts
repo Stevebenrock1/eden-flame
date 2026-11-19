@@ -366,6 +366,49 @@ const tags: Record<string, [Audience[], Feature[]]> = {
 };
 
 /**
+ * Product photos: retailer pack shots (Lovehoney CDN). Steve chose on 2026-11-19 to show these on the
+ * live site before reseller approval. Swap for official brand assets as each supplier approves.
+ */
+const PHOTOS: Record<string, string> = {
+  "lelo-dot": "86048_a48259_purple",
+  "le-wand-rechargeable": "80751_a44845_white",
+  "we-vibe-chorus": "87335_a49322_black",
+  "arcwave-ion-2": "86988_a49023_black",
+  "lovense-osci-3": "87627_a49594_pink",
+  "lovense-solace-pro": "87263_a49258_black",
+  "the-handy": "89236_a50940_black",
+  "b-vibe-rimming-plug-2": "72104_a39268_blue",
+  "magic-wand-rechargeable": "61141_a34101_white",
+  "womanizer-premium-2": "84383_a46996_blue",
+  "womanizer-next": "86328_a48484_purple",
+  "lelo-gigi-3": "87464_a49457_purple",
+  "lelo-sona-3-cruise": "88330_a50182_black",
+  "lelo-enigma-double-sonic": "88329_a50181_purple",
+  "lelo-smart-wand-2": "79907_a44323_black",
+  "lovense-lush-4": "87626_a49593_pink",
+  "we-vibe-touch-x": "82225_a45648_green",
+  "arcwave-voy": "85023_a47471_black",
+  "arcwave-perk": "87089_a49129_black",
+  "lelo-f1s-v3-xl": "87080_a49118_blue",
+  "lelo-tor-3": "86385_a48538_blue",
+  "lelo-hugo-2": "87010_a34279_green",
+  "lovense-edge-2": "82399_a45783_black",
+  "lovense-max-2": "80155_a44502_white",
+  "we-vibe-vector-plus": "87708_a49655_blue",
+  "tenga-flip-zero": "72848_a36407_black",
+  "kiiroo-keon": "83905_a46717_black",
+};
+const LH = "https://media.lovehoneyassets.com/i/lovehoney/";
+const withPhotos = (p: Product): Product => {
+  const id = PHOTOS[p.handle];
+  if (!id) return p;
+  return { ...p, images: [
+    { src: `${LH}${id}_000?w=1200&fmt=auto`, alt: p.images[0]?.alt ?? p.title },
+    { src: `${LH}${id}_001?w=1200&fmt=auto`, alt: p.images[1]?.alt ?? p.title },
+  ] };
+};
+
+/**
  * Launch range (2026-11-17): Steve asked to condense the catalogue to what a new business can stock.
  * Picked for trend strength and an Australian wholesale route (Sugar and Sas: We-Vibe, Womanizer, Arcwave;
  * Calvista: Lovense; Vibratex: Magic Wand; Faire: Le Wand). Everything else stays defined below but hidden;
@@ -389,7 +432,7 @@ export const allProducts: Product[] = [...own.map((p) => ({ ...p, brand: "Eden F
   ...p,
   audience: tags[p.handle]?.[0] ?? ["two"],
   features: tags[p.handle]?.[1] ?? [],
-}));
+})).map(withPhotos);
 
 /** Sample catalog (the launch range). Used when EDEN_API_URL is not set (design mode). */
 export const products: Product[] = allProducts.filter((p) => LAUNCH_RANGE.has(p.handle));

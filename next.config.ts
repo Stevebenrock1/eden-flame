@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     // Add your image CDN here when real product photography arrives
-    remotePatterns: [],
+    remotePatterns: [{ protocol: "https", hostname: "media.lovehoneyassets.com" }],
   },
   async rewrites() {
     return apiUrl ? [{ source: "/api/:path*", destination: `${apiUrl}/api/:path*` }] : [];
