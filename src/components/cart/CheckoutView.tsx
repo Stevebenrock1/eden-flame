@@ -9,7 +9,7 @@ import { DiscretionPromise } from "@/components/cart/DiscretionPromise";
 import { useBagLines } from "@/components/cart/useBagLines";
 import { ButtonLink } from "@/components/ui/Button";
 import { LoopFilm } from "@/components/ui/LoopFilm";
-import { Checkbox } from "@/components/ui/Choice";
+import { Checkbox, RadioGroup } from "@/components/ui/Choice";
 import { Toggle } from "@/components/ui/Toggle";
 import { siteConfig } from "@/config/site";
 import { formatPrice, type Product } from "@/lib/commerce";
@@ -22,6 +22,12 @@ const usd = (amount: number) => formatPrice({ amount, currencyCode: "USD" });
 
 /** We currently deliver within Australia only (see /shipping). */
 const COUNTRIES = ["Australia"];
+
+type PaymentMethod = "card" | "paypal";
+interface PaymentOptions { card: boolean; applePay: boolean; googlePay: boolean; paypal: boolean }
+
+/** Design mode shows every option so the page can be reviewed; with the API, the server decides. */
+const DEMO_OPTIONS: PaymentOptions = { card: true, applePay: false, googlePay: false, paypal: true };
 
 const field =
   "ef-field w-full border-b border-ivory/20 bg-transparent py-3 text-sm text-ivory placeholder:text-ivory/35 focus:border-champagne focus:outline-none";
@@ -47,6 +53,17 @@ export function CheckoutView({ products }: { products: Product[] }) {
   }, [me]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [method, setMethod] = useState<PaymentMethod>("card");
+  const [options, setOptions] = useState<PaymentOptions>(commerceApiEnabled ? { ...DEMO_OPTIONS, paypal: false } : DEMO_OPTIONS);
+  useEffect(() => {
+    if (!commerceApiEnabled) return;
+    apiFetch<PaymentOptions>("/api/checkout/options").then(setOptions).catch(() => undefined);
+  }, []);
+  const wallets = [options.applePay && "Apple Pay", options.googlePay && "Google Pay"].filter(Boolean).join(" or ");
+  const paymentChoices = [
+    { value: "card" as const, label: wallets ? `Card, ${wallets}` : "Card", hint: "On our secure payment page, powered by Stripe." },
+    ...(options.paypal ? [{ value: "paypal" as const, label: "PayPal", hint: "You’ll approve the payment on PayPal, then return here." }] : []),
+  ];
 
   async function startPayment() {
     setSubmitting(true);
@@ -54,7 +71,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
     try {
       const { checkoutUrl } = await apiFetch<{ checkoutUrl: string }>("/api/checkout/session", {
         method: "POST",
-        body: JSON.stringify({ plainPackaging: plainLabel, paperlessReceipt: noInvoice }),
+        body: JSON.stringify({ paymentMethod: method, plainPackaging: plainLabel, paperlessReceipt: noInvoice }),
       });
       window.location.assign(checkoutUrl);
     } catch (err) {
@@ -122,7 +139,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
           {commerceApiEnabled ? (
             <div className="space-y-3 border-l border-champagne/40 pl-5 text-sm text-ivory/65">
               <p className="text-ivory/85">Two quiet steps.</p>
-              <p>Choose your discretion preferences here, then enter your email, delivery address and payment on our secure payment page. We never see or store your card.</p>
+              <p>Choose your discretion preferences and how you'd like to pay here, then enter your email, delivery address and payment on the secure payment page. We never see or store your card.</p>
               <p className="text-xs text-ivory/40">Order emails use a neutral subject line. No product names.</p>
             </div>
           ) : (
@@ -162,9 +179,15 @@ export function CheckoutView({ products }: { products: Product[] }) {
 
           <fieldset>
             <legend className="eyebrow mb-6">{commerceApiEnabled ? "2" : "4"} &middot; Payment</legend>
-            <div className="border border-ivory/10 bg-obsidian-800 p-6 text-sm text-ivory/65">
-              Payment is completed on our secure checkout, powered by Stripe. Cards, Apple Pay and Google Pay accepted. Your statement will read{" "}
-              <span className="text-ivory">EF Studio</span>.
+            <div className="border border-ivory/10 bg-obsidian-800 p-6">
+              {paymentChoices.length > 1 ? (
+                <RadioGroup legend="How would you like to pay?" showLegend={false} name="payment-method" value={method} onChange={setMethod} options={paymentChoices} />
+              ) : (
+                <p className="text-sm text-ivory/65">{paymentChoices[0].label}. {paymentChoices[0].hint}</p>
+              )}
+              <p className="mt-5 border-t border-ivory/10 pt-4 text-xs text-ivory/45">
+                Your statement will read <span className="text-ivory/80">EF Studio</span>. No product names are shared with the payment provider.
+              </p>
             </div>
           </fieldset>
 
@@ -177,7 +200,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
 
           {(error ?? bagError) && <p role="alert" className="border-l border-rosegold pl-4 text-sm text-rosegold">{error ?? bagError}</p>}
           <button type="submit" disabled={submitting} className="flex h-14 w-full items-center justify-center gap-2 gold-foil text-[0.75rem] uppercase tracking-luxe text-obsidian transition-all duration-500 disabled:cursor-wait disabled:opacity-70">
-            <Lock strokeWidth={1.5} className="h-3.5 w-3.5" /> {submitting ? "Preparing secure payment…" : <>Continue to payment &middot; {usd(total)}</>}
+            <Lock strokeWidth={1.5} className="h-3.5 w-3.5" /> {submitting ? "Preparing secure payment…" : <>{method === "paypal" ? "Continue to PayPal" : "Continue to payment"} &middot; {usd(total)}</>}
           </button>
           {!commerceApiEnabled && <p className="-mt-10 text-center text-xs text-ivory/35">Demo only: this places a sample order without charging anything.</p>}
         </motion.form>
