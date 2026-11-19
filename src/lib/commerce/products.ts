@@ -424,7 +424,7 @@ export const LAUNCH_RANGE = new Set([
   // For two
   "we-vibe-chorus", "we-vibe-sync-o", "le-wand-rechargeable",
   // Silk & Senses and Aromatics (simple own-label accessories, low stock cost)
-  "nocturne", "velours", "ember", "elixir",
+  "nocturne", "velours", "ember", "elixir", "reverie",
 ]);
 
 /** Every piece we have listings for, including those not in the launch range. */
