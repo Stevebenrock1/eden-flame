@@ -113,3 +113,6 @@ Fonts: Cormorant Garamond (serif headings) and Inter (sans body), loaded with `n
 - **Performance:** the hero is pure CSS and SVG (no heavy images), it's statically prerendered, fonts are self-hosted, and only the animated pieces are client components. Images will use `next/image` with AVIF and WebP.
 - **Motion feel:** one shared easing curve (`luxeEase`) and slow durations (around 1 second) keep everything calm and expensive-feeling rather than bouncy.
 - **Mobile first:** fluid `clamp()` type sizes, `100svh` hero height that works with mobile browser bars, full-screen mobile menu.
+
+## Photo credits
+- Ember (massage candle): Pexels photo 9268041. Elixir (massage oil): Pexels photo 6628476. Both free under the Pexels License; cropped and colour-graded.
