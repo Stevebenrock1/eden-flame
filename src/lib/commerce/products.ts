@@ -119,11 +119,11 @@ const own: Base[] = [
     badge: "New", featured: 9, createdAt: "2026-11-20",
   },
   {
-    // Added 2026-11-20 at Steve's request (For Him). Image is a studio-style render on the house set; the supplier's
+    // Added 2026-11-20 at Steve's request (For Him), $240 set by Steve. Image is the supplier photo cut out onto a subdued background; the supplier's
     // photo carries marketing text. Placeholders to confirm with the supplier: price, materials, specs, voice feature.
     id: "p17", handle: "celestial", title: "Celestial", subtitle: "Rotating, thrusting automatic stroker",
-    description: "A sleek ivory capsule with a glass-black touch panel that glows softly to life. Inside, a skin-soft sleeve rotates and draws in rhythmic waves, hands-free, while a quiet motor keeps every moment your own.",
-    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(139),
+    description: "A sleek pearl-white capsule with a glass-black touch panel that glows softly to life. Inside, a skin-soft sleeve rotates and draws in rhythmic waves, hands-free, while a quiet motor keeps every moment your own.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(240),
     specs: [{ label: "Sleeve", value: "Removable, skin-soft TPE" }, { label: "Motion", value: "Rotation and thrust, several modes" }, { label: "Controls", value: "Touch panel" }, { label: "Care", value: "Rinse the sleeve, use a water-based lubricant" }],
     images: [
       { src: "/media/products/celestial-1.jpg", alt: "Celestial, an ivory automatic stroker with a black touch panel" },
