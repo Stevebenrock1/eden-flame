@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "@/config/site";
 
 export const AGE_KEY = "ef-age-confirmed";
 const LEAVE_URL = "https://www.google.com";
@@ -86,6 +87,15 @@ export function AgeGate() {
             Leave
           </a>
         </div>
+
+        {siteConfig.constructionNotice && (
+          <div className="mt-12 w-full max-w-md border border-champagne/30 px-6 py-4">
+            <p className="eyebrow text-[0.62rem]">Opening soon</p>
+            <p className="mt-2 text-sm leading-relaxed text-ivory/70">
+              Our site is still under construction. You&rsquo;re welcome to look around, but orders aren&rsquo;t open just yet.
+            </p>
+          </div>
+        )}
 
         <p className="mt-10 max-w-sm text-xs leading-relaxed text-ivory/35">
           Your choice is remembered on this device only. Like everything at Eden Flame, it stays private.

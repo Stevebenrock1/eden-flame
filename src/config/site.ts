@@ -3,6 +3,11 @@ export const siteConfig = {
   tagline: "Intimacy, Refined",
   description:
     "Design-forward intimate wellness, crafted from body-safe materials and delivered with absolute discretion.",
+  /**
+   * Pre-launch notice on the welcome screen and first in the announcement bar.
+   * Set to null at launch to remove it everywhere.
+   */
+  constructionNotice: "Opening soon: our site is still under construction" as string | null,
   /** Rotating messages in the slim bar above the navigation. */
   announcements: [
     "Discreet by design: plain box, private billing",

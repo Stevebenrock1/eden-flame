@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { luxeEase } from "@/lib/motion";
 
-const messages = siteConfig.announcements;
+const messages = siteConfig.constructionNotice ? [siteConfig.constructionNotice, ...siteConfig.announcements] : siteConfig.announcements;
 
 export function AnnouncementBar() {
   const [i, setI] = useState(0);
