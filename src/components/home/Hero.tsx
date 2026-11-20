@@ -94,6 +94,12 @@ export function Hero() {
 
       <motion.div style={{ y: copyY, opacity: copyOpacity }} className="container relative pb-24 pt-40 md:pb-28">
         <motion.div initial="hidden" animate="show" variants={stagger(0.18, 0.4)} className="max-w-3xl">
+          {siteConfig.constructionNotice && (
+            <motion.p variants={fadeUp} className="mb-8 inline-flex items-center gap-3 border border-champagne/40 bg-obsidian/50 px-4 py-2.5 text-xs text-ivory/80 backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-champagne" aria-hidden />
+              <span><span className="uppercase tracking-[0.22em] text-champagne">Opening soon</span> &middot; Our site is still under construction. Orders aren&rsquo;t open yet.</span>
+            </motion.p>
+          )}
           <motion.p variants={fadeUp} className="eyebrow mb-6">
             The Eden Collection &middot; New Season
           </motion.p>
