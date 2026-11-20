@@ -118,6 +118,19 @@ const own: Base[] = [
     ],
     badge: "New", featured: 9, createdAt: "2026-11-20",
   },
+  {
+    // Added 2026-11-20 at Steve's request (For Him). Image is a studio-style render on the house set; the supplier's
+    // photo carries marketing text. Placeholders to confirm with the supplier: price, materials, specs, voice feature.
+    id: "p17", handle: "celestial", title: "Celestial", subtitle: "Rotating, thrusting automatic stroker",
+    description: "A sleek ivory capsule with a glass-black touch panel that glows softly to life. Inside, a skin-soft sleeve rotates and draws in rhythmic waves, hands-free, while a quiet motor keeps every moment your own.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(139),
+    specs: [{ label: "Sleeve", value: "Removable, skin-soft TPE" }, { label: "Motion", value: "Rotation and thrust, several modes" }, { label: "Controls", value: "Touch panel" }, { label: "Care", value: "Rinse the sleeve, use a water-based lubricant" }],
+    images: [
+      { src: "/media/products/celestial-1.jpg", alt: "Celestial, an ivory automatic stroker with a black touch panel" },
+      { src: "/media/products/celestial-2.jpg", alt: "Celestial, close view of the glowing touch panel" },
+    ],
+    badge: "New", featured: 9, createdAt: "2026-11-20",
+  },
 ];
 
 /**
@@ -347,6 +360,7 @@ const tags: Record<string, [Audience[], Feature[]]> = {
   rosalind: [["her"], [R]],
   "clitoral-air-stimulator": [["her"], [R]],
   carmine: [["her"], [R]],
+  celestial: [["him"], [R]],
   lumen: [["her"], [W, R]],
   solenne: [["her", "him"], [W]],
   vesper: [["her"], [W, R]],
@@ -443,9 +457,10 @@ export const LAUNCH_RANGE = new Set([
   // Eden Flame own label
   "seraphine", "rosalind", "clitoral-air-stimulator",
   // For her
-  "carmine", "magic-wand-rechargeable", // Carmine replaced the Womanizer Premium 2 (2026-11-20) "lovense-lush-4", "we-vibe-touch-x",
+  // Carmine replaced the Womanizer Premium 2 (2026-11-20)
+  "carmine", "magic-wand-rechargeable", "lovense-lush-4", "we-vibe-touch-x",
   // For him
-  "we-vibe-vector-plus", "lovense-edge-2", "lovense-max-2", "arcwave-ion-2",
+  "celestial", "we-vibe-vector-plus", "lovense-edge-2", "lovense-max-2", "arcwave-ion-2",
   // For two
   "we-vibe-chorus", "we-vibe-sync-o", "le-wand-rechargeable",
   // Silk & Senses and Aromatics (simple own-label accessories, low stock cost)
