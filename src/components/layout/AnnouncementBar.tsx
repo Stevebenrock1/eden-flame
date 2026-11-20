@@ -6,7 +6,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { luxeEase } from "@/lib/motion";
 
-const messages = siteConfig.constructionNotice ? [siteConfig.constructionNotice, ...siteConfig.announcements] : siteConfig.announcements;
+// Before launch the bar holds the "under construction" notice on its own, so nobody misses it.
+const messages = siteConfig.constructionNotice ? [siteConfig.constructionNotice] : siteConfig.announcements;
 
 export function AnnouncementBar() {
   const [i, setI] = useState(0);
@@ -14,7 +15,7 @@ export function AnnouncementBar() {
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    if (paused || reduce) return;
+    if (paused || reduce || messages.length < 2) return;
     const id = setInterval(() => setI((n) => (n + 1) % messages.length), 6000);
     return () => clearInterval(id);
   }, [paused, reduce]);
@@ -31,9 +32,9 @@ export function AnnouncementBar() {
       onBlur={() => setPaused(false)}
     >
       <div className="container flex h-10 items-center justify-center gap-4">
-        <button type="button" className={btn} aria-label="Previous message" onClick={() => go(-1)}>
+        {messages.length > 1 && <button type="button" className={btn} aria-label="Previous message" onClick={() => go(-1)}>
           <ChevronLeft strokeWidth={1.25} className="h-4 w-4" />
-        </button>
+        </button>}
         <div className="relative h-full w-full max-w-xl overflow-hidden" aria-live="polite">
           <AnimatePresence mode="wait" initial={false}>
             <motion.p
@@ -48,9 +49,9 @@ export function AnnouncementBar() {
             </motion.p>
           </AnimatePresence>
         </div>
-        <button type="button" className={btn} aria-label="Next message" onClick={() => go(1)}>
+        {messages.length > 1 && <button type="button" className={btn} aria-label="Next message" onClick={() => go(1)}>
           <ChevronRight strokeWidth={1.25} className="h-4 w-4" />
-        </button>
+        </button>}
       </div>
     </div>
   );
