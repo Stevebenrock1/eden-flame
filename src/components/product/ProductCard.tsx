@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { formatPrice, type Product } from "@/lib/commerce";
+import { ColourDots } from "@/components/product/ColourSwatches";
 
 interface Props {
   product: Product;
@@ -66,7 +67,10 @@ export function ProductCard({ product, onQuickView, priority }: Props) {
         </div>
         <p className="shrink-0 text-sm text-champagne-light">{formatPrice(product.price)}</p>
       </div>
-      <p className="mt-2 text-[0.65rem] uppercase tracking-[0.16em] text-ivory/35">{product.materials.join(" · ")}</p>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <p className="text-[0.65rem] uppercase tracking-[0.16em] text-ivory/35">{product.materials.join(" · ")}</p>
+        {product.colors && product.colors.length > 1 && <ColourDots colors={product.colors} />}
+      </div>
     </article>
   );
 }

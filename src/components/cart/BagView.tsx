@@ -9,7 +9,7 @@ import { DiscretionPromise } from "@/components/cart/DiscretionPromise";
 import { useBagLines } from "@/components/cart/useBagLines";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatPrice, type Product } from "@/lib/commerce";
-import { useBag } from "@/lib/bag";
+import { lineKey, useBag } from "@/lib/bag";
 import { luxeEase } from "@/lib/motion";
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 
@@ -50,9 +50,13 @@ export function BagView({ products }: { products: Product[] }) {
       <div className="grid gap-14 lg:grid-cols-[1fr_380px] lg:gap-20">
         <ul className="divide-y divide-ivory/[0.08] border-y border-ivory/[0.08]">
           <AnimatePresence initial={false}>
-            {items.map(({ product: p, quantity }) => (
+            {items.map((line) => {
+              const { product: p, quantity, color } = line;
+              const key = lineKey(line);
+              const swatch = p.colors?.find((c) => c.name === color);
+              return (
               <motion.li
-                key={p.handle}
+                key={key}
                 layout
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.5, ease: luxeEase }}
@@ -68,18 +72,24 @@ export function BagView({ products }: { products: Product[] }) {
                         <Link href={`/products/${p.handle}`} className="hover:text-champagne">{p.title}</Link>
                       </h2>
                       <p className="mt-1 text-xs text-ivory/50">{p.subtitle}</p>
+                      {color && (
+                        <p className="mt-2 flex items-center gap-2 text-xs text-ivory/65">
+                          {swatch && <span aria-hidden className="block h-3 w-3 rounded-full ring-1 ring-ivory/25" style={{ background: swatch.hex }} />}
+                          {color}
+                        </p>
+                      )}
                     </div>
-                    <button type="button" onClick={() => remove(p.handle)} aria-label={`Remove ${p.title}`} className="p-1 text-ivory/40 hover:text-champagne">
+                    <button type="button" onClick={() => remove(key)} aria-label={`Remove ${p.title}`} className="p-1 text-ivory/40 hover:text-champagne">
                       <X strokeWidth={1.25} className="h-4 w-4" />
                     </button>
                   </div>
                   <div className="mt-auto flex items-end justify-between pt-6">
                     <div className="flex items-center border border-ivory/15" role="group" aria-label={`Quantity of ${p.title}`}>
-                      <button type="button" aria-label="Decrease" onClick={() => setQuantity(p.handle, quantity - 1)} className="grid h-10 w-9 place-items-center text-ivory/60 hover:text-champagne">
+                      <button type="button" aria-label="Decrease" onClick={() => setQuantity(key, quantity - 1)} className="grid h-10 w-9 place-items-center text-ivory/60 hover:text-champagne">
                         <Minus strokeWidth={1.25} className="h-3 w-3" />
                       </button>
                       <span className="w-6 text-center text-sm">{quantity}</span>
-                      <button type="button" aria-label="Increase" onClick={() => setQuantity(p.handle, Math.min(9, quantity + 1))} className="grid h-10 w-9 place-items-center text-ivory/60 hover:text-champagne">
+                      <button type="button" aria-label="Increase" onClick={() => setQuantity(key, Math.min(9, quantity + 1))} className="grid h-10 w-9 place-items-center text-ivory/60 hover:text-champagne">
                         <Plus strokeWidth={1.25} className="h-3 w-3" />
                       </button>
                     </div>
@@ -87,7 +97,8 @@ export function BagView({ products }: { products: Product[] }) {
                   </div>
                 </div>
               </motion.li>
-            ))}
+              );
+            })}
           </AnimatePresence>
         </ul>
 

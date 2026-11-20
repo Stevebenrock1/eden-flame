@@ -1,5 +1,6 @@
 "use client";
 
+import { ColourSwatches } from "@/components/product/ColourSwatches";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -31,6 +32,7 @@ export function ProductDetail({ product, specs, related }: Props) {
   const { add, error: bagError } = useBag();
   const soldOut = product.availability === "sold_out";
   const [qty, setQty] = useState(1);
+  const [colour, setColour] = useState(product.colors?.[0]?.name ?? "");
   const [added, setAdded] = useState(false);
   const [showBar, setShowBar] = useState(false);
   const [quick, setQuick] = useState<Product | null>(null);
@@ -48,7 +50,7 @@ export function ProductDetail({ product, specs, related }: Props) {
 
   const addToBag = () => {
     if (soldOut) return;
-    add(product.handle, qty);
+    add(product.handle, qty, colour || undefined);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 2400);
   };
@@ -97,6 +99,12 @@ export function ProductDetail({ product, specs, related }: Props) {
               <motion.p variants={fadeUp} className="mt-2 text-ivory/60">{product.subtitle}</motion.p>
               <motion.p variants={fadeUp} className="mt-6 text-2xl text-champagne-light">{formatPrice(product.price)}</motion.p>
               <motion.p variants={fadeUp} className="mt-8 max-w-md leading-relaxed text-ivory/75">{product.description}</motion.p>
+
+              {product.colors && product.colors.length > 1 && (
+                <motion.div variants={fadeUp} className="mt-8">
+                  <ColourSwatches colors={product.colors} value={colour} onChange={setColour} name={`colour-${product.handle}`} />
+                </motion.div>
+              )}
 
               <motion.div variants={fadeUp} ref={buyRef} className="mt-10 flex gap-3">
                 <div className="flex items-center border border-ivory/20" role="group" aria-label="Quantity">
@@ -186,7 +194,7 @@ export function ProductDetail({ product, specs, related }: Props) {
             <div className="container flex items-center gap-4 py-3">
               <div className="hidden min-w-0 flex-1 sm:block">
                 <p className="truncate font-serif text-lg">{product.title}</p>
-                <p className="truncate text-xs text-ivory/50">{product.subtitle}</p>
+                <p className="truncate text-xs text-ivory/50">{colour && (product.colors?.length ?? 0) > 1 ? `${product.subtitle} · ${colour}` : product.subtitle}</p>
               </div>
               <button
                 type="button"
