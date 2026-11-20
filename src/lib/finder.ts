@@ -45,6 +45,7 @@ const SENSATION_OF: Record<string, Sensation[]> = {
   seraphine: ["deep"],
   rosalind: ["focused"],
   "clitoral-air-stimulator": ["focused"],
+  carmine: ["focused"],
   lumen: ["deep"],
   "le-wand-rechargeable": ["deep"],
   "lovense-osci-3": ["deep", "connected"],
