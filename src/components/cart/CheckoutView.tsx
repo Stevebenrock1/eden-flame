@@ -261,15 +261,15 @@ export function CheckoutView({ products }: { products: Product[] }) {
               <Link href="/bag" className="text-xs text-ivory/50 underline-offset-4 hover:text-champagne hover:underline">Edit</Link>
             </div>
             <ul className="space-y-5">
-              {items.map(({ product: p, quantity }) => (
-                <li key={p.handle} className="flex items-center gap-4">
+              {items.map(({ product: p, quantity, color }) => (
+                <li key={`${p.handle}::${color ?? ""}`} className="flex items-center gap-4">
                   <div className="relative aspect-[4/5] w-14 shrink-0 overflow-hidden bg-charcoal">
                     <Image src={p.images[0].src} alt="" fill sizes="56px" className="object-cover" />
                     <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rosegold px-1 text-[0.55rem] text-obsidian">{quantity}</span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-serif text-lg leading-tight">{p.title}</p>
-                    <p className="truncate text-xs text-ivory/45">{p.subtitle}</p>
+                    <p className="truncate text-xs text-ivory/45">{color ? `${p.subtitle} · ${color}` : p.subtitle}</p>
                   </div>
                   <p className="text-sm">{usd(p.price.amount * quantity)}</p>
                 </li>

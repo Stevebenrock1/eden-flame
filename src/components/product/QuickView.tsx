@@ -7,16 +7,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Package, X } from "lucide-react";
 import { formatPrice, type Product } from "@/lib/commerce";
 import { useBag } from "@/lib/bag";
+import { ColourSwatches } from "@/components/product/ColourSwatches";
 import { luxeEase } from "@/lib/motion";
 
 export function QuickView({ product, onClose }: { product: Product | null; onClose: () => void }) {
   const { add } = useBag();
   const [added, setAdded] = useState(false);
+  const [colour, setColour] = useState("");
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!product) return;
     setAdded(false);
+    setColour(product.colors?.[0]?.name ?? "");
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -72,12 +75,16 @@ export function QuickView({ product, onClose }: { product: Product | null; onClo
               <p className="mt-6 text-xl">{formatPrice(product.price)}</p>
               <p className="mt-6 text-sm leading-relaxed text-ivory/70">{product.description}</p>
 
+              {product.colors && product.colors.length > 1 && (
+                <ColourSwatches className="mt-8" colors={product.colors} value={colour} onChange={(c) => { setColour(c); setAdded(false); }} name={`qv-colour-${product.handle}`} />
+              )}
+
               <div className="mt-auto pt-10">
                 <button
                   type="button"
                   disabled={product.availability === "sold_out"}
                   onClick={() => {
-                    add(product.handle);
+                    add(product.handle, 1, colour || undefined);
                     setAdded(true);
                   }}
                   className="flex w-full disabled:cursor-not-allowed disabled:opacity-50 items-center justify-center gap-2 gold-foil py-4 text-[0.75rem] uppercase tracking-luxe text-obsidian transition-colors"

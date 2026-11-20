@@ -16,6 +16,13 @@ export type Material =
   | "Plant-based botanicals"
   | "Body-safe ABS";
 
+/** A colourway a customer can choose. */
+export interface Colour {
+  name: string;
+  /** Swatch fill; a CSS colour or gradient. */
+  hex: string;
+}
+
 export interface Money {
   amount: number;
   currencyCode: "USD";
@@ -35,6 +42,8 @@ export interface Product {
   materials: Material[];
   price: Money;
   images: { src: string; alt: string }[];
+  /** Colourways, first is the default. Absent or one entry: no choice is shown. */
+  colors?: Colour[];
   /** Spec sheet for the product page; falls back to the category defaults when absent. */
   specs?: { label: string; value: string }[];
   badge?: "New" | "Bestseller" | "Limited";

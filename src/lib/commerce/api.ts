@@ -17,7 +17,7 @@ interface ApiProduct {
   materials: string[];
   category: { slug: string; name: string } | null;
   availability: "in_stock" | "low_stock" | "sold_out";
-  metadata: { images?: { src: string; alt: string }[]; badge?: Product["badge"] | null; brand?: string; specs?: Product["specs"]; audience?: Audience[]; features?: Feature[] } | null;
+  metadata: { images?: { src: string; alt: string }[]; badge?: Product["badge"] | null; brand?: string; specs?: Product["specs"]; colors?: Product["colors"]; audience?: Audience[]; features?: Feature[] } | null;
   createdAt: string;
 }
 
@@ -47,6 +47,7 @@ function toProduct(p: ApiProduct, featured: number): Product {
     images,
     badge: p.metadata?.badge ?? undefined,
     specs: p.metadata?.specs?.length ? p.metadata.specs : undefined,
+    colors: p.metadata?.colors?.length ? p.metadata.colors : undefined,
     featured,
     createdAt: p.createdAt.slice(0, 10),
     availability: p.availability,

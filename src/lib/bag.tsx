@@ -6,9 +6,18 @@ import { apiFetch, hasSessionHint, onSessionChange, refreshSession } from "@/lib
 export interface BagLine {
   handle: string;
   quantity: number;
+  /** Chosen colourway, when the piece has colours. */
+  color?: string;
   /** Set when the bag lives on the API. */
   productId?: string;
 }
+
+/** One line per piece and colour: "handle" or "handle::Colour". */
+export const lineKey = (l: { handle: string; color?: string | null }) => (l.color ? `${l.handle}::${l.color}` : l.handle);
+const splitKey = (key: string) => {
+  const [handle, color] = key.split("::");
+  return { handle: handle!, color: color || undefined };
+};
 
 interface BagContextValue {
   lines: BagLine[];
@@ -17,9 +26,11 @@ interface BagContextValue {
   ready: boolean;
   /** Last error from the server (e.g. a piece sold out), cleared on the next change. */
   error: string | null;
-  add: (handle: string, quantity?: number) => void;
-  remove: (handle: string) => void;
-  setQuantity: (handle: string, quantity: number) => void;
+  add: (handle: string, quantity?: number, color?: string) => void;
+  /** Takes a line key (see lineKey). */
+  remove: (key: string) => void;
+  /** Takes a line key (see lineKey). */
+  setQuantity: (key: string, quantity: number) => void;
   clear: () => void;
   /** Re-reads the bag from the server (e.g. after returning from payment). */
   refresh: () => Promise<void>;
@@ -30,13 +41,14 @@ const STORAGE_KEY = "ef-bag";
 const USE_API = process.env.NEXT_PUBLIC_COMMERCE_API === "1";
 
 interface ApiCartView {
-  items: { productId: string; slug: string; quantity: number }[];
+  items: { productId: string; slug: string; quantity: number; color?: string }[];
 }
 
 /** Signed in: the account's bag (access token attached). Guest: the bag in the HTTP-only cookie. */
 const api = (path: string, init?: RequestInit) => apiFetch<ApiCartView>(`/api/cart${path}`, init);
 
-const fromView = (v: ApiCartView): BagLine[] => v.items.map((i) => ({ handle: i.slug, quantity: i.quantity, productId: i.productId }));
+const fromView = (v: ApiCartView): BagLine[] =>
+  v.items.map((i) => ({ handle: i.slug, quantity: i.quantity, productId: i.productId, color: i.color || undefined }));
 
 /**
  * The bag.
@@ -106,44 +118,49 @@ export function BagProvider({ children }: { children: React.ReactNode }) {
     }
   }, [lines, ready]);
 
-  const idOf = (handle: string) => linesRef.current.find((l) => l.handle === handle)?.productId;
+  const idOf = (key: string) => linesRef.current.find((l) => lineKey(l) === key)?.productId;
   // Server lines seen most recently (kept even after an optimistic removal hides the line).
   const serverIds = useRef(new Map<string, string>());
-  const withId = (handle: string, known: string | undefined, call: (id: string) => Promise<ApiCartView>) => {
+  const withId = (key: string, known: string | undefined, call: (id: string, color: string) => Promise<ApiCartView>) => {
+    const { handle, color } = splitKey(key);
     const id = known ?? serverIds.current.get(handle);
-    return id ? call(id) : api("");
+    return id ? call(id, color ?? "") : api("");
   };
+  const itemPath = (id: string, color: string) => `/items/${id}${color ? `?color=${encodeURIComponent(color)}` : ""}`;
 
   const add = useCallback(
-    (handle: string, quantity = 1) => {
+    (handle: string, quantity = 1, color?: string) => {
+      const key = lineKey({ handle, color });
       setLines((prev) => {
-        const hit = prev.find((l) => l.handle === handle);
-        return hit ? prev.map((l) => (l.handle === handle ? { ...l, quantity: l.quantity + quantity } : l)) : [...prev, { handle, quantity }];
+        const hit = prev.find((l) => lineKey(l) === key);
+        return hit ? prev.map((l) => (lineKey(l) === key ? { ...l, quantity: l.quantity + quantity } : l)) : [...prev, { handle, quantity, color }];
       });
-      if (USE_API) void sync(() => api("/items", { method: "POST", body: JSON.stringify({ slug: handle, quantity }) }));
+      if (USE_API) void sync(() => api("/items", { method: "POST", body: JSON.stringify({ slug: handle, quantity, ...(color ? { color } : {}) }) }));
     },
     [sync],
   );
 
   const remove = useCallback(
-    (handle: string) => {
+    (key: string) => {
       // Capture the id before removing the line; a just-added line gets its id from the server
       // response, which arrives before this queued call runs.
-      const known = idOf(handle);
-      setLines((prev) => prev.filter((l) => l.handle !== handle));
-      if (USE_API) void sync(() => withId(handle, known, (id) => api(`/items/${id}`, { method: "DELETE" })));
+      const known = idOf(key);
+      setLines((prev) => prev.filter((l) => lineKey(l) !== key));
+      if (USE_API) void sync(() => withId(key, known, (id, color) => api(itemPath(id, color), { method: "DELETE" })));
     },
     [sync],
   );
 
   const setQuantity = useCallback(
-    (handle: string, quantity: number) => {
-      const known = idOf(handle);
+    (key: string, quantity: number) => {
+      const known = idOf(key);
       setLines((prev) =>
-        quantity <= 0 ? prev.filter((l) => l.handle !== handle) : prev.map((l) => (l.handle === handle ? { ...l, quantity } : l)),
+        quantity <= 0 ? prev.filter((l) => lineKey(l) !== key) : prev.map((l) => (lineKey(l) === key ? { ...l, quantity } : l)),
       );
       if (USE_API)
-        void sync(() => withId(handle, known, (id) => api(`/items/${id}`, { method: "PATCH", body: JSON.stringify({ quantity: Math.max(0, quantity) }) })));
+        void sync(() =>
+          withId(key, known, (id, color) => api(itemPath(id, color), { method: "PATCH", body: JSON.stringify({ quantity: Math.max(0, quantity) }) })),
+        );
     },
     [sync],
   );

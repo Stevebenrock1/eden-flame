@@ -95,6 +95,17 @@ const own: Base[] = [
     category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(89),
     images: img("rosalind", "Rosalind"), badge: "New", featured: 7, createdAt: "2026-11-17",
   },
+  {
+    // Added 2026-11-20 from Steve's photo. Placeholders to confirm: price, materials, specs.
+    id: "p15", handle: "clitoral-air-stimulator", title: "Clitoral Air Stimulator", subtitle: "Air-pulse stimulator",
+    description: "A sleek, ergonomic form finished in soft-touch silicone with a fine gold accent. Gentle waves of air pulse around the clitoris without direct contact, building sensation gradually, with a whisper-quiet motor and simple controls that sit naturally under the thumb.",
+    category: "sculptural-essentials", materials: ["Medical-grade silicone"], price: usd(119),
+    images: [
+      { src: "/media/products/clitoral-air-stimulator-1.jpg", alt: "Clitoral Air Stimulator in black with a gold band" },
+      { src: "/media/products/clitoral-air-stimulator-2.jpg", alt: "Clitoral Air Stimulator, close view of the air-pulse head" },
+    ],
+    badge: "New", featured: 7, createdAt: "2026-11-20",
+  },
 ];
 
 /**
@@ -322,6 +333,7 @@ const tags: Record<string, [Audience[], Feature[]]> = {
   aurelia: [["her"], [W, R]],
   seraphine: [["her"], []],
   rosalind: [["her"], [R]],
+  "clitoral-air-stimulator": [["her"], [R]],
   lumen: [["her"], [W, R]],
   solenne: [["her", "him"], [W]],
   vesper: [["her"], [W, R]],
@@ -416,7 +428,7 @@ const withPhotos = (p: Product): Product => {
  */
 export const LAUNCH_RANGE = new Set([
   // Eden Flame own label
-  "seraphine", "rosalind",
+  "seraphine", "rosalind", "clitoral-air-stimulator",
   // For her
   "womanizer-premium-2", "magic-wand-rechargeable", "lovense-lush-4", "we-vibe-touch-x",
   // For him
@@ -427,11 +439,35 @@ export const LAUNCH_RANGE = new Set([
   "nocturne", "velours", "ember", "elixir", "reverie",
 ]);
 
+/**
+ * Colourways (2026-11-20, Steve asked for a colour choice on each piece).
+ * Branded colours are from the makers' current ranges as best known; CONFIRM with each supplier
+ * (Sugar and Sas, Calvista, Faire) before launch and remove any you won't stock.
+ * Own-label colours are proposals for the factory. Scents (Ember, Elixir, Reverie) have no colour.
+ */
+const OBSIDIAN = { name: "Obsidian", hex: "#1a1715" };
+const CHAMPAGNE = { name: "Champagne", hex: "#d9c08e" };
+const COLOURS: Record<string, Product["colors"]> = {
+  seraphine: [{ name: "Plum", hex: "#6b2d5c" }, CHAMPAGNE, OBSIDIAN],
+  rosalind: [{ name: "Rose", hex: "#b3263e" }, { name: "Blush", hex: "#e3a5a8" }, OBSIDIAN],
+  "womanizer-premium-2": [{ name: "Bordeaux", hex: "#6e1f2e" }, { name: "Blueberry", hex: "#3b3f73" }, { name: "Black", hex: "#141414" }],
+  "we-vibe-touch-x": [{ name: "Fuchsia", hex: "#c2185b" }, { name: "Green Velvet", hex: "#2f5d50" }],
+  "we-vibe-vector-plus": [{ name: "Royal Blue", hex: "#2f4f9e" }, { name: "Charcoal Black", hex: "#2a2a2c" }],
+  "arcwave-ion-2": [{ name: "Black", hex: "#141414" }, { name: "Blue", hex: "#2c4a7a" }],
+  "lovense-max-2": [{ name: "White", hex: "#ece9e4" }, { name: "Black", hex: "#141414" }],
+  "we-vibe-chorus": [{ name: "Cosmic Pink", hex: "#d77fa1" }, { name: "Cosmic Blue", hex: "#4f6bb0" }, { name: "Purple", hex: "#6b4c9a" }],
+  "we-vibe-sync-o": [{ name: "Light Pink", hex: "#e8b4bc" }, { name: "Green Velvet", hex: "#2f5d50" }],
+  "le-wand-rechargeable": [{ name: "Black", hex: "#141414" }, { name: "Rose Gold", hex: "linear-gradient(135deg,#e8b8a0,#b77b67)" }, { name: "Navy", hex: "#22304f" }],
+  nocturne: [OBSIDIAN, CHAMPAGNE, { name: "Bordeaux", hex: "#5e1a26" }],
+  velours: [OBSIDIAN, CHAMPAGNE, { name: "Bordeaux", hex: "#5e1a26" }],
+};
+
 /** Every piece we have listings for, including those not in the launch range. */
 export const allProducts: Product[] = [...own.map((p) => ({ ...p, brand: "Eden Flame" })), ...curated].map((p) => ({
   ...p,
   audience: tags[p.handle]?.[0] ?? ["two"],
   features: tags[p.handle]?.[1] ?? [],
+  colors: COLOURS[p.handle],
 })).map(withPhotos);
 
 /** Sample catalog (the launch range). Used when EDEN_API_URL is not set (design mode). */
