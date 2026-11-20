@@ -106,6 +106,18 @@ const own: Base[] = [
     ],
     badge: "New", featured: 7, createdAt: "2026-11-20",
   },
+  {
+    // Added 2026-11-20 in place of the Womanizer Premium 2. Image is a studio-style render until the
+    // supplier sends clean (unwatermarked) photos. Placeholders to confirm: price, materials, specs.
+    id: "p16", handle: "carmine", title: "Carmine", subtitle: "Lipstick-slim bullet massager",
+    description: "Slender as a lipstick and lacquered in deep carmine, it slips into a clutch without a second glance. A single, softly rounded tip delivers focused, deep vibration, controlled by one discreet button at its base.",
+    category: "sculptural-essentials", materials: ["Body-safe ABS"], price: usd(49),
+    images: [
+      { src: "/media/products/carmine-1.jpg", alt: "Carmine, a slim glossy red bullet massager" },
+      { src: "/media/products/carmine-2.jpg", alt: "Carmine, close view of its lacquered finish" },
+    ],
+    badge: "New", featured: 9, createdAt: "2026-11-20",
+  },
 ];
 
 /**
@@ -334,6 +346,7 @@ const tags: Record<string, [Audience[], Feature[]]> = {
   seraphine: [["her"], []],
   rosalind: [["her"], [R]],
   "clitoral-air-stimulator": [["her"], [R]],
+  carmine: [["her"], [R]],
   lumen: [["her"], [W, R]],
   solenne: [["her", "him"], [W]],
   vesper: [["her"], [W, R]],
@@ -430,7 +443,7 @@ export const LAUNCH_RANGE = new Set([
   // Eden Flame own label
   "seraphine", "rosalind", "clitoral-air-stimulator",
   // For her
-  "womanizer-premium-2", "magic-wand-rechargeable", "lovense-lush-4", "we-vibe-touch-x",
+  "carmine", "magic-wand-rechargeable", // Carmine replaced the Womanizer Premium 2 (2026-11-20) "lovense-lush-4", "we-vibe-touch-x",
   // For him
   "we-vibe-vector-plus", "lovense-edge-2", "lovense-max-2", "arcwave-ion-2",
   // For two
