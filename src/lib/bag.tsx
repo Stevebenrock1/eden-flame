@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch, hasSessionHint, onSessionChange, refreshSession } from "@/lib/session";
+import { shopifyCartCompleted } from "@/lib/shopify-actions";
 
 export interface BagLine {
   handle: string;
@@ -39,6 +40,9 @@ interface BagContextValue {
 const BagContext = createContext<BagContextValue | null>(null);
 const STORAGE_KEY = "ef-bag";
 const USE_API = process.env.NEXT_PUBLIC_COMMERCE_API === "1";
+const USE_SHOPIFY = process.env.NEXT_PUBLIC_COMMERCE_SHOPIFY === "1";
+/** The Shopify cart last sent to checkout; once Shopify reports it paid, the bag empties. */
+export const SHOPIFY_CART_KEY = "ef-shopify-cart";
 
 interface ApiCartView {
   items: { productId: string; slug: string; quantity: number; color?: string }[];
@@ -54,7 +58,8 @@ const fromView = (v: ApiCartView): BagLine[] =>
  * The bag.
  * - With the Eden Flame API: the bag lives on the server (guest cookie, merged into the account
  *   at sign-in). Changes show instantly, then the server's version replaces them.
- * - Without it: a browser-only bag in localStorage, for design work.
+ * - Without it: a browser-only bag in localStorage (design work, and Shopify mode, where the
+ *   bag becomes a Shopify cart at checkout).
  */
 export function BagProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<BagLine[]>([]);
@@ -104,6 +109,24 @@ export function BagProvider({ children }: { children: React.ReactNode }) {
       /* private mode or blocked storage: start empty */
     }
     setReady(true);
+    if (USE_SHOPIFY) {
+      let cartId: string | null = null;
+      try {
+        cartId = localStorage.getItem(SHOPIFY_CART_KEY);
+      } catch {
+        /* ignore */
+      }
+      if (cartId)
+        void shopifyCartCompleted(cartId).then((done) => {
+          if (!done) return;
+          setLines([]);
+          try {
+            localStorage.removeItem(SHOPIFY_CART_KEY);
+          } catch {
+            /* ignore */
+          }
+        });
+    }
   }, [refresh]);
 
   // Signing in merges the guest bag into the account; signing out returns to a guest bag.
@@ -185,3 +208,4 @@ export function useBag() {
 }
 
 export const commerceApiEnabled = USE_API;
+export const shopifyCheckoutEnabled = USE_SHOPIFY;

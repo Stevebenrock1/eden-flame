@@ -1,5 +1,5 @@
 /**
- * Commerce types, filled from the Eden Flame API (see api.ts) or the sample catalog.
+ * Commerce types, filled from Shopify (see shopify.ts), the Eden Flame API (see api.ts) or the sample catalog.
  */
 export type CategorySlug = "sculptural-essentials" | "silk-and-senses" | "aromatics";
 
@@ -25,7 +25,8 @@ export interface Colour {
 
 export interface Money {
   amount: number;
-  currencyCode: "USD";
+  /** Shown as a plain "$" whatever the code (see formatPrice). */
+  currencyCode: string;
 }
 
 export interface Product {
@@ -53,4 +54,6 @@ export interface Product {
   createdAt: string;
   /** Stock state from the API (exact counts are never exposed). Absent in mock mode. */
   availability?: "in_stock" | "low_stock" | "sold_out";
+  /** Shopify variants (one per colourway), used to build the Shopify cart. Shopify mode only. */
+  variants?: { id: string; available: boolean; color?: string }[];
 }

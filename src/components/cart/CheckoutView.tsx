@@ -14,7 +14,8 @@ import { Toggle } from "@/components/ui/Toggle";
 import { siteConfig } from "@/config/site";
 import { formatPrice, type Product } from "@/lib/commerce";
 import { shippingFor, WELCOME_PERCENT } from "@/lib/pricing";
-import { commerceApiEnabled, useBag } from "@/lib/bag";
+import { commerceApiEnabled, SHOPIFY_CART_KEY, shopifyCheckoutEnabled, useBag } from "@/lib/bag";
+import { startShopifyCheckout } from "@/lib/shopify-actions";
 import { useAuth } from "@/lib/auth";
 import { ApiError, apiFetch } from "@/lib/session";
 import { fadeUp } from "@/lib/motion";
@@ -22,7 +23,10 @@ import { fadeUp } from "@/lib/motion";
 const usd = (amount: number) =>
   Number.isInteger(amount)
     ? formatPrice({ amount, currencyCode: "USD" })
-    : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(amount);
+    : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: "narrowSymbol", minimumFractionDigits: 2 }).format(amount);
+
+/** Shopify or the Eden Flame API collects contact, delivery and payment on a secure hosted page. */
+const hosted = commerceApiEnabled || shopifyCheckoutEnabled;
 
 /** We currently deliver within Australia only (see /shipping). */
 const COUNTRIES = ["Australia"];
@@ -44,13 +48,15 @@ const field =
 
 /**
  * Checkout.
+ * On Shopify, "Continue to secure checkout" turns the bag into a Shopify cart and hands over
+ * to Shopify's checkout (contact, delivery, codes, shipping rates and payment).
  * With the Eden Flame API, "Continue to payment" reserves the pieces and hands over to
  * Stripe's secure hosted page, which collects contact, delivery and payment details.
  * Without the API (design mode) it places a sample order locally.
  */
 export function CheckoutView({ products }: { products: Product[] }) {
   const { clear, ready, error: bagError, refresh } = useBag();
-  const { items, subtotal } = useBagLines(products);
+  const { items, subtotal, lines } = useBagLines(products);
   const [codeInput, setCodeInput] = useState("");
   const [applied, setApplied] = useState<AppliedCode | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -59,6 +65,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
   const discount = !applied
     ? 0
     : Math.min(subtotal, applied.type === "PERCENT" ? Math.floor(subtotal * applied.value) / 100 : applied.value / 100);
+  // On Shopify the final rate is set by Shopify's shipping settings, which mirror src/lib/pricing.ts.
   const shipping = shippingFor(subtotal - discount);
   const total = subtotal - discount + shipping;
 
@@ -104,6 +111,26 @@ export function CheckoutView({ products }: { products: Product[] }) {
     { value: "card" as const, label: wallets ? `Card, ${wallets}` : "Card", hint: "On our secure payment page, powered by Stripe." },
     ...(options.paypal ? [{ value: "paypal" as const, label: "PayPal", hint: "You’ll approve the payment on PayPal, then return here." }] : []),
   ];
+
+  async function startShopify() {
+    setSubmitting(true);
+    setError(null);
+    const result = await startShopifyCheckout(
+      lines.map((l) => ({ handle: l.handle, quantity: l.quantity, color: l.color })),
+      { plainPackaging: plainLabel, paperlessReceipt: noInvoice },
+    ).catch(() => ({ error: "We couldn't reach our secure checkout. Please check your connection and try again." }));
+    if ("checkoutUrl" in result) {
+      try {
+        localStorage.setItem(SHOPIFY_CART_KEY, result.cartId);
+      } catch {
+        /* the bag just won't empty itself after payment */
+      }
+      window.location.assign(result.checkoutUrl);
+      return;
+    }
+    setError(result.error);
+    setSubmitting(false);
+  }
 
   async function startPayment() {
     setSubmitting(true);
@@ -167,6 +194,10 @@ export function CheckoutView({ products }: { products: Product[] }) {
           variants={fadeUp}
           onSubmit={(e) => {
             e.preventDefault();
+            if (shopifyCheckoutEnabled) {
+              void startShopify();
+              return;
+            }
             if (commerceApiEnabled) {
               void startPayment();
               return;
@@ -176,10 +207,14 @@ export function CheckoutView({ products }: { products: Product[] }) {
           }}
           className="space-y-14"
         >
-          {commerceApiEnabled ? (
+          {hosted ? (
             <div className="space-y-3 border-l border-champagne/40 pl-5 text-sm text-ivory/65">
               <p className="text-ivory/85">Two quiet steps.</p>
-              <p>Choose your discretion preferences and how you'd like to pay here, then enter your email, delivery address and payment on the secure payment page. We never see or store your card.</p>
+              <p>
+                {shopifyCheckoutEnabled
+                  ? "Choose your discretion preferences here, then enter your email, delivery address and payment on our secure checkout. We never see or store your card."
+                  : "Choose your discretion preferences and how you'd like to pay here, then enter your email, delivery address and payment on the secure payment page. We never see or store your card."}
+              </p>
               <p className="text-xs text-ivory/40">Order emails use a neutral subject line. No product names.</p>
             </div>
           ) : (
@@ -210,7 +245,7 @@ export function CheckoutView({ products }: { products: Product[] }) {
           )}
 
           <fieldset>
-            <legend className="eyebrow mb-6">{commerceApiEnabled ? "1" : "3"} &middot; Discretion</legend>
+            <legend className="eyebrow mb-6">{hosted ? "1" : "3"} &middot; Discretion</legend>
             <div className="space-y-4">
               <Toggle checked={plainLabel} onChange={setPlainLabel} label="Plain shipping label" hint="Sender shows as “EF Studio” with a neutral return address." />
               <Toggle checked={noInvoice} onChange={setNoInvoice} label="No printed receipt in the parcel" hint="Your receipt is emailed instead." />
@@ -218,15 +253,17 @@ export function CheckoutView({ products }: { products: Product[] }) {
           </fieldset>
 
           <fieldset>
-            <legend className="eyebrow mb-6">{commerceApiEnabled ? "2" : "4"} &middot; Payment</legend>
+            <legend className="eyebrow mb-6">{hosted ? "2" : "4"} &middot; Payment</legend>
             <div className="border border-ivory/10 bg-obsidian-800 p-6">
-              {paymentChoices.length > 1 ? (
+              {shopifyCheckoutEnabled ? (
+                <p className="text-sm text-ivory/65">You’ll pay on our secure checkout in the next step, where you’ll see every way to pay and the delivery options.</p>
+              ) : paymentChoices.length > 1 ? (
                 <RadioGroup legend="How would you like to pay?" showLegend={false} name="payment-method" value={method} onChange={setMethod} options={paymentChoices} />
               ) : (
                 <p className="text-sm text-ivory/65">{paymentChoices[0].label}. {paymentChoices[0].hint}</p>
               )}
               <p className="mt-5 border-t border-ivory/10 pt-4 text-xs text-ivory/45">
-                Your statement will read <span className="text-ivory/80">EF Studio</span>. No product names are shared with the payment provider.
+                Your statement will read <span className="text-ivory/80">EF Studio</span>.{shopifyCheckoutEnabled ? "" : " No product names are shared with the payment provider."}
               </p>
             </div>
           </fieldset>
@@ -240,9 +277,9 @@ export function CheckoutView({ products }: { products: Product[] }) {
 
           {(error ?? bagError) && <p role="alert" className="border-l border-rosegold pl-4 text-sm text-rosegold">{error ?? bagError}</p>}
           <button type="submit" disabled={submitting} className="flex h-14 w-full items-center justify-center gap-2 gold-foil text-[0.75rem] uppercase tracking-luxe text-obsidian transition-all duration-500 disabled:cursor-wait disabled:opacity-70">
-            <Lock strokeWidth={1.5} className="h-3.5 w-3.5" /> {submitting ? "Preparing secure payment…" : <>{method === "paypal" ? "Continue to PayPal" : "Continue to payment"} &middot; {usd(total)}</>}
+            <Lock strokeWidth={1.5} className="h-3.5 w-3.5" /> {submitting ? "Preparing secure checkout…" : <>{shopifyCheckoutEnabled ? "Continue to secure checkout" : method === "paypal" ? "Continue to PayPal" : "Continue to payment"} &middot; {usd(total)}</>}
           </button>
-          {!commerceApiEnabled && <p className="-mt-10 text-center text-xs text-ivory/35">Demo only: this places a sample order without charging anything.</p>}
+          {!hosted && <p className="-mt-10 text-center text-xs text-ivory/35">Demo only: this places a sample order without charging anything.</p>}
         </motion.form>
 
         <aside className="lg:sticky lg:top-28 lg:self-start">
@@ -276,7 +313,9 @@ export function CheckoutView({ products }: { products: Product[] }) {
               ))}
             </ul>
             <div className="mt-8 border-t border-ivory/10 pt-6">
-              {applied ? (
+              {shopifyCheckoutEnabled ? (
+                <p className="text-xs text-ivory/50">Have a welcome or discount code? You can add it on the next step.</p>
+              ) : applied ? (
                 <p className="flex items-center justify-between text-sm">
                   <span className="text-ivory/70">Code <span className="tracking-wide text-champagne">{applied.code}</span></span>
                   <button type="button" onClick={() => setApplied(null)} className="text-xs text-ivory/45 underline-offset-4 hover:text-champagne hover:underline">Remove</button>
