@@ -1,16 +1,20 @@
 import { cache } from "react";
 import { API_URL, fetchAllProducts } from "./api";
 import { products } from "./products";
+import { fetchShopifyProducts, shopifyEnabled } from "./shopify";
 import type { Audience, CategorySlug, Feature, Material, Product } from "./types";
 
 export * from "./types";
 
 /**
  * The single entry point for product data.
- * With EDEN_API_URL set, products come from the Eden Flame API; without it the
- * built-in sample catalog is used (handy for design work with no backend running).
+ * With SHOPIFY_STORE_DOMAIN + SHOPIFY_STOREFRONT_TOKEN set, products come from Shopify.
+ * Otherwise, with EDEN_API_URL set, from the Eden Flame API; with neither, the built-in
+ * sample catalog is used (handy for design work with no backend running).
  */
-export const getProducts = cache(async (): Promise<Product[]> => (API_URL ? fetchAllProducts() : products));
+export const getProducts = cache(async (): Promise<Product[]> =>
+  shopifyEnabled ? fetchShopifyProducts() : API_URL ? fetchAllProducts() : products,
+);
 
 export async function getProduct(handle: string): Promise<Product | undefined> {
   return (await getProducts()).find((p) => p.handle === handle);
@@ -99,7 +103,8 @@ export function filterProducts(list: Product[], f: ProductFilters): Product[] {
 }
 
 export function formatPrice({ amount, currencyCode }: { amount: number; currencyCode: string }) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: currencyCode, maximumFractionDigits: 0 }).format(amount);
+  // narrowSymbol keeps the price reading "$189" for AUD (Shopify) as well as the sample USD prices.
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: currencyCode, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(amount);
 }
 
 /** Spec sheet shown on the product page. Product metadata from the API can supply these later. */

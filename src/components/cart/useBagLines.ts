@@ -14,6 +14,6 @@ export function useBagLines(products: Product[]) {
       .filter((l): l is typeof l & { product: Product } => Boolean(l.product));
     const subtotal = items.reduce((n, l) => n + l.product.price.amount * l.quantity, 0);
     const shipping = shippingFor(subtotal);
-    return { items, subtotal, shipping, total: subtotal + shipping };
+    return { items, lines, subtotal, shipping, total: subtotal + shipping };
   }, [lines, products]);
 }

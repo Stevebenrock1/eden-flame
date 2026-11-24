@@ -65,6 +65,44 @@ src/
     └── commerce/               ✅ data layer: Eden Flame API (api.ts), sample catalog fallback
 ```
 
+## Running on Shopify
+
+The shop can run "headless" on Shopify: Shopify holds products, stock, orders, payments and
+any dropship supplier apps, while this site keeps its own design and reads everything through
+the Storefront API (`src/lib/commerce/shopify.ts`).
+
+1. **Create the store.** shopify.com.au, country Australia, currency AUD.
+2. **Get a Storefront API token.** Shopify admin > Settings > Apps and sales channels >
+   Develop apps > Create an app ("Website") > Configure Storefront API scopes: tick
+   `unauthenticated_read_product_listings`, `unauthenticated_read_product_tags`,
+   `unauthenticated_write_checkouts` and `unauthenticated_read_checkouts` > Install, then copy
+   the **Storefront API access token**. (The Headless sales channel app gives the same token.)
+3. **Make products visible to the site.** Each product must be published to that app's sales
+   channel (product page > Publishing).
+4. **Import the launch range.** `node --experimental-strip-types scripts/shopify-products-csv.mts > shopify-products.csv`,
+   then Products > Import.
+5. **Set Vercel environment variables** `SHOPIFY_STORE_DOMAIN` (e.g. `eden-flame.myshopify.com`)
+   and `SHOPIFY_STOREFRONT_TOKEN`, and redeploy.
+6. **Shipping rates** in Shopify should match `src/lib/pricing.ts` ($12, free over $100), which
+   the bag and checkout summary show as the estimate.
+
+How Shopify data maps onto the site, so supplier-imported products show up without extra work:
+
+| Shopify | Site |
+| --- | --- |
+| Vendor | Maker shown above the title ("Eden Flame" for own label) |
+| Product type `Sculptural Essentials` / `Silk & Senses` / `Aromatics` | Collection |
+| Tags `for:her` `for:him` `for:two` | Shop for (For Her / For Him / For Two) |
+| Tags `feature:Waterproof`, `material:Mulberry silk`, `badge:New` | Filters and badges |
+| Option named `Colour` | Colour swatches (Shopify swatch colour if set) |
+| Metafields `eden.subtitle`, `eden.specs` (JSON `[{label, value}]`) | Subtitle and spec sheet |
+
+Anything missing falls back to this site's own listing with the same handle. The bag stays in
+the browser; "Continue to secure checkout" turns it into a Shopify cart (the discretion choices
+travel as cart attributes on the order) and opens Shopify's checkout. Once Shopify reports the
+cart paid, the bag empties itself. Accounts, newsletter and welcome codes still belong to the
+Eden Flame API and are not yet moved to Shopify.
+
 ## How it connects to the backend
 
 The storefront talks to the Eden Flame API (`eden-flame-api`):

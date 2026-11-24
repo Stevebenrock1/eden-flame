@@ -410,7 +410,6 @@ const tags: Record<string, [Audience[], Feature[]]> = {
  */
 const PHOTOS: Record<string, string> = {
   "lelo-dot": "86048_a48259_purple",
-  "le-wand-rechargeable": "80751_a44845_white",
   "we-vibe-chorus": "87335_a49322_black",
   "arcwave-ion-2": "86988_a49023_black",
   "lovense-osci-3": "87627_a49594_pink",
