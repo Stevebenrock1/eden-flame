@@ -155,3 +155,4 @@ Fonts: Cormorant Garamond (serif headings) and Inter (sans body), loaded with `n
 
 ## Photo credits
 - Ember (massage candle): Pexels photo 9268041. Elixir (massage oil): Pexels photo 6628476. Both free under the Pexels License; cropped and colour-graded.
+- Sculptural Essentials tile: the Rosalind product image. Nocturne (silk blindfold) and the Silk & Senses tile: Pexels photo 18788962. Velours (silk wrist ties): Pexels photo 6037949. Reverie (pillow and body mist) and the Aromatics tile: Pexels photo 8789609. All free under the Pexels License; cropped and colour-graded.
