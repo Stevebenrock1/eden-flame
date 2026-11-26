@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { useAutoLoop } from "@/lib/useAutoLoop";
 
 interface Props {
   mp4: string;
@@ -16,32 +16,27 @@ interface Props {
   position?: string;
 }
 
-/** Silent, looping background film that respects "reduce motion" and only plays while on screen. */
+/** Silent, looping background film that plays on its own and only while on screen. */
 export function LoopFilm({ mp4, webm, poster, className, controls = true, position = "object-center" }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
-  const reduce = useReducedMotion();
-  const [playing, setPlaying] = useState(!reduce);
+  const [playing, setPlaying] = useState(true);
+  const [onScreen, setOnScreen] = useState(false);
 
+  // Save battery and bandwidth: only run while on screen
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (reduce) {
-      v.pause();
-      setPlaying(false);
-      return;
-    }
-    // Save battery and bandwidth: pause when scrolled out of view
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && playing) void v.play().catch(() => {});
-      else v.pause();
-    });
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
     io.observe(v);
     return () => io.disconnect();
-  }, [reduce, playing]);
+  }, []);
+
+  // Loops on its own while visible, with no tap needed; the pause button still works
+  useAutoLoop(ref, playing && onScreen);
 
   return (
     <div className={cn("relative overflow-hidden bg-obsidian", className)}>
-      <video ref={ref} className={cn("h-full w-full object-cover", position)} muted loop playsInline preload="metadata" poster={poster} aria-hidden>
+      <video ref={ref} className={cn("h-full w-full object-cover", position)} autoPlay muted loop playsInline preload="metadata" poster={poster} aria-hidden>
         {webm && <source src={webm} type="video/webm" />}
         <source src={mp4} type="video/mp4" />
       </video>
