@@ -6,6 +6,7 @@ import { Pause, Play } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/config/site";
 import { fadeUp, stagger, wordReveal } from "@/lib/motion";
+import { useAutoLoop } from "@/lib/useAutoLoop";
 
 const headline = [
   { text: "Desire,", italic: false },
@@ -36,27 +37,9 @@ export function Hero() {
   const copyY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "-18%"]);
   const copyOpacity = useTransform(scrollYProgress, [0, 0.6], [1, reduce ? 1 : 0]);
 
-  // Respect "reduce motion": show the still poster instead of the looping film
-  useEffect(() => {
-    const v = video.current;
-    if (!v) return;
-    if (reduce) {
-      v.pause();
-      setPlaying(false);
-    }
-  }, [reduce]);
-
-  const toggle = () => {
-    const v = video.current;
-    if (!v) return;
-    if (v.paused) {
-      void v.play();
-      setPlaying(true);
-    } else {
-      v.pause();
-      setPlaying(false);
-    }
-  };
+  // The film loops on its own (Steve, 2026-11-26: no tap needed); the pause button still works
+  useAutoLoop(video, playing);
+  const toggle = () => setPlaying((p) => !p);
 
   return (
     <section
@@ -69,7 +52,7 @@ export function Hero() {
         <video
           ref={video}
           className="h-full w-full object-cover"
-          autoPlay={!reduce}
+          autoPlay
           muted
           loop
           playsInline
